@@ -3,6 +3,13 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Scale, AlertCircle } from 'lucide-react';
 
+// ---------------------------------------------------------------------------
+// Owner Registration
+// ---------------------------------------------------------------------------
+// Collects only the owner's personal details. The payment / verification fee
+// flow is handled on the owner's application (see My Applications), not here.
+// ---------------------------------------------------------------------------
+
 export default function Register() {
   const { register } = useApp();
   const navigate = useNavigate();

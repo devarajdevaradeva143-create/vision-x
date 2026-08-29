@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 
 const statusColors = {
+  PAYMENT_PENDING: '#f59e0b',
   SUBMITTED: '#6366f1',
   SCHEDULED: '#f59e0b',
   INSPECTED: '#0ea5e9',
@@ -27,6 +28,15 @@ const steps = [
 export function ProgressTracker({ status }) {
   const currentIndex = steps.findIndex(s => s.key === status);
   const isRejected = status === 'REJECTED';
+
+  // Before payment the application has not really started the workflow yet.
+  if (status === 'PAYMENT_PENDING') {
+    return (
+      <div style={{ padding: '14px 18px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, color: '#b45309', fontWeight: 600, fontSize: 13 }}>
+        ⏳ Payment Pending — complete the payment to submit this application for verification.
+      </div>
+    );
+  }
 
   if (isRejected) {
     return (
