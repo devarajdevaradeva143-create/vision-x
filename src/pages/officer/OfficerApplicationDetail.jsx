@@ -45,20 +45,29 @@ export default function OfficerApplicationDetail() {
 
   const issueCertificate = (result) => {
     const existing = appCertificates.find(c => c.applicationId === app.id);
+    // Store the certificate as a permanent issued SNAPSHOT: it holds every
+    // detail shown on the public verification page so the QR always matches
+    // the exact issued certificate and cannot be altered by later edits.
     const cert = {
       ...(existing || {}),
       id: existing?.id || generateCertificateId(),
       applicationId: app.id,
-      instrumentId: instrument.id,
+      instrumentId: app.instrumentId ?? instrument?.id ?? null,
       ownerId: owner.id,
       ownerName: owner.name,
-      instrumentType: instrument.type,
-      category: instrument.category,
-      serialNumber: instrument.serialNumber,
+      machineType: app.machineType || instrument?.category,
+      instrumentType: instrument?.type || app.machineType,
+      category: instrument?.category || app.machineType,
+      manufacturer: app.manufacturer ?? instrument?.manufacturer,
+      model: app.modelNumber ?? instrument?.modelNumber,
+      serialNumber: app.serialNumber ?? instrument?.serialNumber,
+      capacity: app.capacity ?? instrument?.capacity,
+      location: app.location ?? instrument?.location,
       verificationDate: new Date().toISOString().slice(0, 10),
       issueDate: new Date().toISOString().slice(0, 10),
       expiryDate: result === 'CERTIFIED' ? expiry : null,
       result,
+      status: result,
       officerId: currentUser.id,
       officerName: currentUser.name,
     };

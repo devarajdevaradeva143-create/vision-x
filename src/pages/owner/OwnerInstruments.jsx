@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useApp } from '../../context/AppContext';
 import { PageHeader, Card, Table, EmptyState } from '../../components/ui';
 import { instrumentCategories } from '../../data/mockData';
+import { buildVerifyUrl } from '../../utils/verifyUrl';
 
 export default function OwnerInstruments() {
   const { currentUser, appInstruments, addInstrument, appCertificates } = useApp();
@@ -89,7 +90,7 @@ export default function OwnerInstruments() {
                 <td style={{ padding: '12px 14px' }}>
                   {cert ? (
                     <Link to={`/certificates/${cert.applicationId}`} title="View certificate QR">
-                      <QRCodeSVG value={`${window.location.origin}/verify?cert=${cert.id}`} size={40} />
+                      <QRCodeSVG value={buildVerifyUrl(cert.id)} size={40} />
                     </Link>
                   ) : (
                     <span style={{ color: '#cbd5e1', fontSize: 12 }}>—</span>

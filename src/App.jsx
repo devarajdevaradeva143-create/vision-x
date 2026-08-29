@@ -40,6 +40,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<PublicVerify />} />
+        <Route path="/verify/:certId" element={<PublicVerify />} />
 
         <Route path="/dashboard" element={<Protected><Layout><Dashboard /></Layout></Protected>} />
 

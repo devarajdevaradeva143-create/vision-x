@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useApp } from '../context/AppContext';
 import { Card, PageHeader, Field, DetailRow } from '../components/ui';
 import { fmt } from '../utils/format';
+import { buildVerifyUrl } from '../utils/verifyUrl';
 
 export default function CertificateDetail() {
   const { id } = useParams();
@@ -16,12 +17,11 @@ export default function CertificateDetail() {
 }
 
 export function CertificateView({ cert, onBack }) {
-  const { appInstruments, appUsers } = useApp();
-  const instrument = appInstruments.find(i => i.id === cert.instrumentId);
-  const officer = appUsers.find(u => u.id === cert.officerId);
-  const verificationUrl = `${window.location.origin}/verify?cert=${cert.id}`;
+  // Build the public verification URL (uses VITE_PUBLIC_URL, never localhost).
+  const verificationUrl = buildVerifyUrl(cert.id);
   const isExpired = new Date(cert.expiryDate) < new Date();
   const expiringSoon = !isExpired && (new Date(cert.expiryDate) - new Date()) / (1000 * 60 * 60 * 24) <= 30;
+  const statusLabel = cert.status === 'REVOKED' ? 'REVOKED' : isExpired ? 'EXPIRED' : expiringSoon ? 'EXPIRING SOON' : 'VERIFIED / VALID';
   const expiryColor = isExpired ? '#ef4444' : expiringSoon ? '#f59e0b' : '#22c55e';
 
   return (
@@ -52,20 +52,24 @@ export function CertificateView({ cert, onBack }) {
             <div>
               <DetailRow>
                 <Field label="Application Ref" value={cert.applicationId} />
-                <Field label="Instrument ID" value={cert.instrumentId} />
+                <Field label="Machine / Instrument ID" value={cert.instrumentId} />
                 <Field label="Owner Name" value={cert.ownerName} />
-                <Field label="Instrument Type" value={cert.instrumentType} />
-                <Field label="Category" value={cert.category} />
+                <Field label="Machine Type" value={cert.machineType} />
+                <Field label="Manufacturer" value={cert.manufacturer} />
+                <Field label="Model" value={cert.model} />
                 <Field label="Serial Number" value={cert.serialNumber} />
+                <Field label="Capacity" value={cert.capacity} />
+                <Field label="Location" value={cert.location} />
                 <Field label="Verification Date" value={fmt(cert.verificationDate)} />
                 <Field label="Issue Date" value={fmt(cert.issueDate)} />
                 <Field label="Expiry Date" value={fmt(cert.expiryDate)} color={expiryColor} />
+                <Field label="Certificate Status" value={statusLabel} color={expiryColor} />
                 <Field label="Officer / Tester" value={cert.officerName} />
               </DetailRow>
 
               <div style={{ marginTop: 24, padding: 14, background: cert.result === 'CERTIFIED' ? '#f0fdf4' : '#fef2f2', border: `1px solid ${cert.result === 'CERTIFIED' ? '#bbf7d0' : '#fecaca'}`, borderRadius: 8 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: cert.result === 'CERTIFIED' ? '#15803d' : '#b91c1c' }}>
-                  Verification Result: {cert.result === 'CERTIFIED' ? 'INSTRUMENT VERIFIED & CERTIFIED' : 'REJECTED'}
+                  Verification Result: {cert.result === 'CERTIFIED' ? 'VERIFIED & CERTIFIED' : 'REJECTED'}
                 </div>
                 <div style={{ fontSize: 13, color: '#475569', marginTop: 4 }}>
                   This is to certify that the above instrument has been verified by the Legal Metrology Department and found to be accurate, precise and conforming to the prescribed standards.
