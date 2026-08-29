@@ -10,7 +10,7 @@ export default function OfficerApplications() {
   const { currentUser, appApplications, appInstruments, appUsers } = useApp();
   const [filter, setFilter] = useState('ALL');
 
-  const myApps = appApplications.filter(a => a.officerId === currentUser.id);
+  const myApps = appApplications.filter(a => a.officerId === currentUser.id || (a.officerId === null && a.status === 'SUBMITTED'));
   const filtered = filter === 'ALL' ? myApps : myApps.filter(a => a.status === filter);
 
   return (

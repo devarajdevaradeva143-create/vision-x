@@ -1,16 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { useApp } from '../../context/AppContext';
 import { PageHeader, Card, Table, EmptyState } from '../../components/ui';
-import { instrumentCategories } from '../../data/mockData';
+import PaymentModal from './PaymentModal';
+
+const FALLBACK_CATEGORIES = [
+  { type: 'Weighing', categories: ['Electronic Balance', 'Platform Scale', 'Crane Scale', 'Weigh Bridge', 'Analytical Balance', 'Spring Balance'] },
+  { type: 'Measuring', categories: ['Fuel Dispenser', 'Taximeter', 'Flow Meter', 'Pressure Gauge', 'Volumetric Flask', 'Measuring Tape'] },
+  { type: 'Testing', categories: ['Hardness Tester', 'Tensile Testing Machine', 'Impact Tester', 'Calorimeter'] },
+];
+
+function getPaymentBadge(ins, handlePayNow) {
+  const status = ins.paymentStatus || 'PAID';
+  if (status === 'PAID') {
+    return <span style={{ background: '#22c55e22', color: '#15803d', padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700 }}>Paid</span>;
+  }
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <span style={{ background: '#f59e0b22', color: '#b45309', padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700 }}>Pending</span>
+      <button onClick={() => handlePayNow(ins.id)} style={smallBtnStyle}>Pay Now</button>
+    </div>
+  );
+}
 
 export default function OwnerInstruments() {
-  const { currentUser, appInstruments, addInstrument, appCertificates } = useApp();
+  const { currentUser, appInstruments, addInstrument, updateInstrument, appCertificates } = useApp();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ type: '', category: '', manufacturer: '', modelNumber: '', serialNumber: '', capacity: '', location: '' });
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [pendingPayment, setPendingPayment] = useState(null);
 
   const myInstruments = appInstruments.filter(i => i.ownerId === currentUser.id);
+
+  useEffect(() => {
+    fetch('/data/instrument-categories.json')
+      .then(res => res.json())
+      .then(data => {
+        setCategories(data);
+        setLoadingCategories(false);
+      })
+      .catch(() => {
+        setCategories(FALLBACK_CATEGORIES);
+        setLoadingCategories(false);
+      });
+  }, []);
 
   const handleTypeChange = (e) => {
     setForm({ ...form, type: e.target.value, category: '' });
@@ -18,19 +53,35 @@ export default function OwnerInstruments() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const newInstrumentId = `INS${String(appInstruments.length + 1).padStart(3, '0')}`;
     addInstrument({
-      id: `INS${String(appInstruments.length + 1).padStart(3, '0')}`,
+      id: newInstrumentId,
       ownerId: currentUser.id,
       ...form,
+      paymentStatus: 'PENDING',
     });
     setShowForm(false);
     setForm({ type: '', category: '', manufacturer: '', modelNumber: '', serialNumber: '', capacity: '', location: '' });
+    setPendingPayment({ instrumentId: newInstrumentId });
+  };
+
+  const handlePaymentSuccess = (paymentId, instrumentId) => {
+    updateInstrument(instrumentId, {
+      paymentStatus: 'PAID',
+      paymentId,
+      paymentDate: new Date().toISOString().slice(0, 10),
+    });
+    setPendingPayment(null);
+  };
+
+  const handlePayNow = (instrumentId) => {
+    setPendingPayment({ instrumentId });
   };
 
   const inputStyle = { width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 14 };
   const Label = ({ children }) => <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4, marginTop: 10 }}>{children}</div>;
 
-  const selectedCategories = form.type ? instrumentCategories.find(c => c.type === form.type)?.categories || [] : [];
+  const selectedCategories = form.type ? categories.find(c => c.type === form.type)?.categories || [] : [];
 
   return (
     <div>
@@ -47,14 +98,14 @@ export default function OwnerInstruments() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <div>
                 <Label>Instrument Type</Label>
-                <select name="type" value={form.type} onChange={handleTypeChange} style={inputStyle} required>
+                <select name="type" value={form.type} onChange={handleTypeChange} style={inputStyle} required disabled={loadingCategories}>
                   <option value="">Select type</option>
-                  {instrumentCategories.map(c => <option key={c.type} value={c.type}>{c.type}</option>)}
+                  {categories.map(c => <option key={c.type} value={c.type}>{c.type}</option>)}
                 </select>
               </div>
               <div>
                 <Label>Category</Label>
-                <select name="category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} style={inputStyle} required disabled={!form.type}>
+                <select name="category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} style={inputStyle} required disabled={!form.type || loadingCategories}>
                   <option value="">Select category</option>
                   {selectedCategories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -70,11 +121,20 @@ export default function OwnerInstruments() {
         </Card>
       )}
 
+      {pendingPayment && (
+        <PaymentModal
+          title="Instrument Registration Fee"
+          amount={300}
+          onSuccess={(paymentId) => handlePaymentSuccess(paymentId, pendingPayment.instrumentId)}
+          onClose={() => setPendingPayment(null)}
+        />
+      )}
+
       {myInstruments.length === 0 ? (
         <EmptyState message="You have not registered any instruments yet." />
       ) : (
         <Card>
-          <Table headers={['ID', 'Category', 'Manufacturer', 'Model', 'Serial No.', 'Capacity', 'Location', 'QR']}>
+          <Table headers={['ID', 'Category', 'Manufacturer', 'Model', 'Serial No.', 'Capacity', 'Location', 'Payment', 'QR']}>
             {myInstruments.map(ins => {
               const cert = appCertificates.find(c => c.instrumentId === ins.id);
               return (
@@ -86,6 +146,7 @@ export default function OwnerInstruments() {
                 <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.serialNumber}</td>
                 <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.capacity}</td>
                 <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.location}</td>
+                <td style={{ padding: '12px 14px' }}>{getPaymentBadge(ins, handlePayNow)}</td>
                 <td style={{ padding: '12px 14px' }}>
                   {cert ? (
                     <Link to={`/certificates/${cert.applicationId}`} title="View certificate QR">
@@ -108,4 +169,9 @@ export default function OwnerInstruments() {
 const addBtn = {
   background: '#4f46e5', color: '#fff', padding: '10px 18px', borderRadius: 8,
   fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
+};
+
+const smallBtnStyle = {
+  background: '#4f46e5', color: '#fff', padding: '6px 12px', borderRadius: 6,
+  fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
 };

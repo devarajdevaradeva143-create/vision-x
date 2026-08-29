@@ -10,7 +10,8 @@ export default function OwnerApplications() {
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState('');
 
-  const myInstruments = appInstruments.filter(i => i.ownerId === currentUser.id);
+  const allMyInstruments = appInstruments.filter(i => i.ownerId === currentUser.id);
+  const myInstruments = allMyInstruments.filter(i => i.paymentStatus === 'PAID');
   const myApps = appApplications.filter(a => a.ownerId === currentUser.id);
   const [selectedInstrument, setSelectedInstrument] = useState('');
 
@@ -50,8 +51,10 @@ export default function OwnerApplications() {
           <h3 style={{ margin: '0 0 8px', fontSize: 16, color: '#0f172a' }}>Submit Verification Application</h3>
           <p style={{ margin: '0 0 12px', color: '#64748b', fontSize: 13 }}>Apply to get your instrument verified and certified by a Government Officer.</p>
           {error && <Alert type="error">{error}</Alert>}
-          {myInstruments.length === 0 ? (
+          {allMyInstruments.length === 0 ? (
             <Alert type="warning">You need to <Link to="/instruments" style={{ color: '#0ea5e9', fontWeight: 700 }}>register an instrument</Link> first.</Alert>
+          ) : myInstruments.length === 0 ? (
+            <Alert type="warning">Complete payment on your instrument before applying for verification.</Alert>
           ) : (
             <>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>Select Instrument</div>

@@ -22,14 +22,14 @@ export const instrumentCategories = [
 ];
 
 export const instruments = [
-  { id: 'INS001', ownerId: 'OWN001', type: 'Weighing', category: 'Electronic Balance', manufacturer: 'Mettler Toledo', modelNumber: 'ME204', serialNumber: 'MT-2024-8831', capacity: '220 g', location: 'Mumbai Central Lab' },
-  { id: 'INS002', ownerId: 'OWN001', type: 'Weighing', category: 'Platform Scale', manufacturer: 'Essae', modelNumber: 'DS-852', serialNumber: 'ES-2023-4412', capacity: '500 kg', location: 'Mumbai Warehouse' },
-  { id: 'INS003', ownerId: 'OWN002', type: 'Measuring', category: 'Fuel Dispenser', manufacturer: 'Tokheim', modelNumber: 'Quantum 400', serialNumber: 'TK-2024-1199', capacity: '50 L/min', location: 'Delhi Fuel Station' },
-  { id: 'INS004', ownerId: 'OWN002', type: 'Measuring', category: 'Taximeter', manufacturer: 'Omnitec', modelNumber: 'TM-200', serialNumber: 'OT-2023-5567', capacity: 'N/A', location: 'Delhi Taxi Depot' },
-  { id: 'INS005', ownerId: 'OWN003', type: 'Weighing', category: 'Weigh Bridge', manufacturer: 'Avery Weigh-Tronix', modelNumber: 'WI-130', serialNumber: 'AW-2022-9912', capacity: '40 tonne', location: 'Ahmedabad Highway Checkpost' },
-  { id: 'INS006', ownerId: 'OWN003', type: 'Measuring', category: 'Flow Meter', manufacturer: 'Endress+Hauser', modelNumber: 'Promag 10W', serialNumber: 'EH-2024-2233', capacity: '0-200 m³/h', location: 'Ahmedabad Processing Plant' },
-  { id: 'INS007', ownerId: 'OWN004', type: 'Weighing', category: 'Analytical Balance', manufacturer: 'Sartorius', modelNumber: 'Quintix 224', serialNumber: 'SQ-2024-7788', capacity: '220 g', location: 'Jaipur Quality Lab' },
-  { id: 'INS008', ownerId: 'OWN001', type: 'Testing', category: 'Hardness Tester', manufacturer: 'Instron', modelNumber: 'Wilson RB2000', serialNumber: 'IN-2023-3344', capacity: 'Rockwell/Brinell', location: 'Mumbai Testing Center' },
+  { id: 'INS001', ownerId: 'OWN001', type: 'Weighing', category: 'Electronic Balance', manufacturer: 'Mettler Toledo', modelNumber: 'ME204', serialNumber: 'MT-2024-8831', capacity: '220 g', location: 'Mumbai Central Lab', paymentStatus: 'PAID' },
+  { id: 'INS002', ownerId: 'OWN001', type: 'Weighing', category: 'Platform Scale', manufacturer: 'Essae', modelNumber: 'DS-852', serialNumber: 'ES-2023-4412', capacity: '500 kg', location: 'Mumbai Warehouse', paymentStatus: 'PAID' },
+  { id: 'INS003', ownerId: 'OWN002', type: 'Measuring', category: 'Fuel Dispenser', manufacturer: 'Tokheim', modelNumber: 'Quantum 400', serialNumber: 'TK-2024-1199', capacity: '50 L/min', location: 'Delhi Fuel Station', paymentStatus: 'PAID' },
+  { id: 'INS004', ownerId: 'OWN002', type: 'Measuring', category: 'Taximeter', manufacturer: 'Omnitec', modelNumber: 'TM-200', serialNumber: 'OT-2023-5567', capacity: 'N/A', location: 'Delhi Taxi Depot', paymentStatus: 'PAID' },
+  { id: 'INS005', ownerId: 'OWN003', type: 'Weighing', category: 'Weigh Bridge', manufacturer: 'Avery Weigh-Tronix', modelNumber: 'WI-130', serialNumber: 'AW-2022-9912', capacity: '40 tonne', location: 'Ahmedabad Highway Checkpost', paymentStatus: 'PAID' },
+  { id: 'INS006', ownerId: 'OWN003', type: 'Measuring', category: 'Flow Meter', manufacturer: 'Endress+Hauser', modelNumber: 'Promag 10W', serialNumber: 'EH-2024-2233', capacity: '0-200 m³/h', location: 'Ahmedabad Processing Plant', paymentStatus: 'PAID' },
+  { id: 'INS007', ownerId: 'OWN004', type: 'Weighing', category: 'Analytical Balance', manufacturer: 'Sartorius', modelNumber: 'Quintix 224', serialNumber: 'SQ-2024-7788', capacity: '220 g', location: 'Jaipur Quality Lab', paymentStatus: 'PAID' },
+  { id: 'INS008', ownerId: 'OWN001', type: 'Testing', category: 'Hardness Tester', manufacturer: 'Instron', modelNumber: 'Wilson RB2000', serialNumber: 'IN-2023-3344', capacity: 'Rockwell/Brinell', location: 'Mumbai Testing Center', paymentStatus: 'PAID' },
 ];
 
 const statusFlow = ['SUBMITTED', 'SCHEDULED', 'INSPECTED', 'CERTIFIED'];

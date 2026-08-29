@@ -1,0 +1,5 @@
+[
+  { "type": "Weighing", "categories": ["Electronic Balance", "Platform Scale", "Crane Scale", "Weigh Bridge", "Analytical Balance", "Spring Balance"] },
+  { "type": "Measuring", "categories": ["Fuel Dispenser", "Taximeter", "Flow Meter", "Pressure Gauge", "Volumetric Flask", "Measuring Tape"] },
+  { "type": "Testing", "categories": ["Hardness Tester", "Tensile Testing Machine", "Impact Tester", "Calorimeter"] }
+]
