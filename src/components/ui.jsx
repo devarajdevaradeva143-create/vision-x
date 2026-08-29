@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 
 const statusColors = {
   PAYMENT_PENDING: '#f59e0b',
@@ -9,23 +9,60 @@ const statusColors = {
   REJECTED: '#ef4444',
 };
 
+const statusLabelKeys = {
+  PAYMENT_PENDING: 'statusPaymentPending',
+  SUBMITTED: 'statusSubmitted',
+  SCHEDULED: 'statusScheduled',
+  INSPECTED: 'statusInspected',
+  CERTIFIED: 'statusCertified',
+  REJECTED: 'statusRejected',
+};
+
 export function StatusBadge({ status }) {
+  const { t } = useLanguage();
   const color = statusColors[status] || '#64748b';
+  // Keep the underlying status code (it is the shared enum used everywhere) but
+  // display it through the translation key for the selected language.
+  const label = statusLabelKeys[status] ? t(statusLabelKeys[status]) : status;
   return (
     <span style={{ background: `${color}22`, color, padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>
-      {status}
+      {label}
+    </span>
+  );
+}
+
+// Complaint workflow statuses (independent of the application status enum used
+// by StatusBadge above, so the two never interfere):
+// PENDING -> ASSIGNED -> INSPECTION SCHEDULED -> INSPECTED -> ACTION TAKEN -> RESOLVED
+const complaintStatusColors = {
+  PENDING: '#ef4444',
+  ASSIGNED: '#f59e0b',
+  'INSPECTION SCHEDULED': '#0ea5e9',
+  INSPECTED: '#6366f1',
+  'ACTION TAKEN': '#9333ea',
+  RESOLVED: '#22c55e',
+};
+
+export function ComplaintStatusBadge({ status }) {
+  const { t } = useLanguage();
+  const color = complaintStatusColors[status] || '#64748b';
+  const label = t(`complaintStatus_${status.replace(/ /g, '_')}`) || status;
+  return (
+    <span style={{ background: `${color}22`, color, padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>
+      {label}
     </span>
   );
 }
 
 const steps = [
-  { key: 'SUBMITTED', label: 'Submitted' },
-  { key: 'SCHEDULED', label: 'Scheduled' },
-  { key: 'INSPECTED', label: 'Inspected' },
-  { key: 'CERTIFIED', label: 'Certified' },
+  { key: 'SUBMITTED', labelKey: 'statSubmitted' },
+  { key: 'SCHEDULED', labelKey: 'statScheduled' },
+  { key: 'INSPECTED', labelKey: 'statInspected' },
+  { key: 'CERTIFIED', labelKey: 'statCertifiedAdmin' },
 ];
 
 export function ProgressTracker({ status }) {
+  const { t } = useLanguage();
   const currentIndex = steps.findIndex(s => s.key === status);
   const isRejected = status === 'REJECTED';
 
@@ -61,7 +98,7 @@ export function ProgressTracker({ status }) {
               }}>
                 {done ? (done && i === currentIndex ? String(i + 1) : '✓') : String(i + 1)}
               </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color: done ? '#15803d' : '#94a3b8' }}>{step.label}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: done ? '#15803d' : '#94a3b8' }}>{t(step.labelKey)}</span>
             </div>
             {i < steps.length - 1 && (
               <div style={{ width: 30, height: 2, background: i < currentIndex ? '#22c55e' : '#e2e8f0', margin: '0 8px' }} />

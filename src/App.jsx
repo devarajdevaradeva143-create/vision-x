@@ -19,6 +19,9 @@ import AdminApplications from './pages/admin/AdminApplications';
 import AdminCertificates from './pages/admin/AdminCertificates';
 import PublicVerify from './pages/PublicVerify';
 import CertificateDetail from './pages/CertificateDetail';
+import PublicComplaint from './pages/PublicComplaint';
+import OfficerComplaints from './pages/officer/OfficerComplaints';
+import OfficerComplaintDetail from './pages/officer/OfficerComplaintDetail';
 
 function Protected({ children }) {
   const { currentUser } = useApp();
@@ -41,6 +44,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<PublicVerify />} />
         <Route path="/verify/:certId" element={<PublicVerify />} />
+        <Route path="/report" element={<PublicComplaint />} />
 
         <Route path="/dashboard" element={<Protected><Layout><Dashboard /></Layout></Protected>} />
 
@@ -54,6 +58,8 @@ export default function App() {
         <Route path="/officer/applications/:id" element={<Protected><Layout><RoleOnly role="officer"><OfficerApplicationDetail /></RoleOnly></Layout></Protected>} />
         <Route path="/officer/inspections" element={<Protected><Layout><RoleOnly role="officer"><OfficerInspections /></RoleOnly></Layout></Protected>} />
         <Route path="/officer/certificates" element={<Protected><Layout><RoleOnly role="officer"><OfficerCertificates /></RoleOnly></Layout></Protected>} />
+        <Route path="/officer/complaints" element={<Protected><Layout><RoleOnly role="officer"><OfficerComplaints /></RoleOnly></Layout></Protected>} />
+        <Route path="/officer/complaints/:id" element={<Protected><Layout><RoleOnly role="officer"><OfficerComplaintDetail /></RoleOnly></Layout></Protected>} />
 
         <Route path="/admin/users" element={<Protected><Layout><RoleOnly role="admin"><AdminUsers /></RoleOnly></Layout></Protected>} />
         <Route path="/admin/instruments" element={<Protected><Layout><RoleOnly role="admin"><AdminInstruments /></RoleOnly></Layout></Protected>} />

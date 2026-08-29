@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { PageHeader, Card, Table, EmptyState } from '../../components/ui';
 import { fmt, expiryInfo } from '../../utils/format';
 
 export default function OwnerCertificates() {
   const { currentUser, appCertificates, appInstruments } = useApp();
+  const { t } = useLanguage();
 
   const myCerts = appCertificates
     .filter(c => c.ownerId === currentUser.id)
@@ -12,14 +14,13 @@ export default function OwnerCertificates() {
 
   return (
     <div>
-      <PageHeader title="My Certificates" subtitle="View and download certificates for your verified instruments" />
+      <PageHeader title={t('myCertificates')} subtitle={t('viewDownloadCerts')} />
 
       {myCerts.length === 0 ? (
-        <EmptyState message="No certificates have been issued for your instruments yet." />
+        <EmptyState message={t('ownerCertsEmpty')} />
       ) : (
         <Card>
-          <Table headers={['Certificate No.', 'Instrument', 'Serial No.', 'Issue Date', 'Expiry Date', 'Validity', '']}>
-            {myCerts.map(cert => {
+          <Table headers={[t('certNo'), t('certInstrument'), t('serialNo'), t('issueDateTable'), t('expiryDateTable'), t('validity'), '']}>{myCerts.map(cert => {
               const info = expiryInfo(cert.expiryDate);
               const ins = appInstruments.find(i => i.id === cert.instrumentId);
               return (
@@ -33,7 +34,7 @@ export default function OwnerCertificates() {
                     <span style={{ fontWeight: 700, color: info.color, fontSize: 13 }}>{info.label}</span>
                   </td>
                   <td style={{ padding: '12px 14px' }}>
-                    <Link to={`/certificates/${cert.applicationId}`} style={viewBtn}>View & QR</Link>
+                    <Link to={`/certificates/${cert.applicationId}`} style={viewBtn}>{t('viewCertificate')}</Link>
                   </td>
                 </tr>
               );

@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { PageHeader, Card, Table, EmptyState } from '../../components/ui';
 import { instrumentCategories } from '../../data/mockData';
 import { buildVerifyUrl } from '../../utils/verifyUrl';
 
 export default function OwnerInstruments() {
   const { currentUser, appInstruments, addInstrument, appCertificates } = useApp();
+  const { t } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ type: '', category: '', manufacturer: '', modelNumber: '', serialNumber: '', capacity: '', location: '' });
 
@@ -36,46 +38,46 @@ export default function OwnerInstruments() {
   return (
     <div>
       <PageHeader
-        title="My Instruments"
-        subtitle="Register and manage your weighing and measuring instruments"
-        action={<button onClick={() => setShowForm(!showForm)} style={addBtn}>{showForm ? 'Cancel' : '+ Add Instrument'}</button>}
+        title={t('myInstruments')}
+        subtitle={t('registerAndManage')}
+        action={<button onClick={() => setShowForm(!showForm)} style={addBtn}>{showForm ? t('cancel') : t('addInstrument')}</button>}
       />
 
       {showForm && (
         <Card style={{ marginBottom: 20 }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: 16, color: '#0f172a' }}>Register New Instrument</h3>
+          <h3 style={{ margin: '0 0 12px', fontSize: 16, color: '#0f172a' }}>{t('registerNewInstrument')}</h3>
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
               <div>
-                <Label>Instrument Type</Label>
+                <Label>{t('instrumentType')}</Label>
                 <select name="type" value={form.type} onChange={handleTypeChange} style={inputStyle} required>
-                  <option value="">Select type</option>
+                  <option value="">{t('selectType')}</option>
                   {instrumentCategories.map(c => <option key={c.type} value={c.type}>{c.type}</option>)}
                 </select>
               </div>
               <div>
-                <Label>Category</Label>
+                <Label>{t('category')}</Label>
                 <select name="category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} style={inputStyle} required disabled={!form.type}>
-                  <option value="">Select category</option>
+                  <option value="">{t('selectCategory')}</option>
                   {selectedCategories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-              <div><Label>Manufacturer</Label><input name="manufacturer" value={form.manufacturer} onChange={e => setForm({ ...form, manufacturer: e.target.value })} style={inputStyle} required /></div>
-              <div><Label>Model Number</Label><input name="modelNumber" value={form.modelNumber} onChange={e => setForm({ ...form, modelNumber: e.target.value })} style={inputStyle} required /></div>
-              <div><Label>Serial Number</Label><input name="serialNumber" value={form.serialNumber} onChange={e => setForm({ ...form, serialNumber: e.target.value })} style={inputStyle} required /></div>
-              <div><Label>Capacity / Range</Label><input name="capacity" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} style={inputStyle} required placeholder="e.g. 220 g" /></div>
-              <div style={{ gridColumn: '1 / -1' }}><Label>Location</Label><input name="location" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} style={inputStyle} required /></div>
+              <div><Label>{t('manufacturer')}</Label><input name="manufacturer" value={form.manufacturer} onChange={e => setForm({ ...form, manufacturer: e.target.value })} style={inputStyle} required /></div>
+              <div><Label>{t('modelNumber')}</Label><input name="modelNumber" value={form.modelNumber} onChange={e => setForm({ ...form, modelNumber: e.target.value })} style={inputStyle} required /></div>
+              <div><Label>{t('serialNumber')}</Label><input name="serialNumber" value={form.serialNumber} onChange={e => setForm({ ...form, serialNumber: e.target.value })} style={inputStyle} required /></div>
+              <div><Label>{t('capacityRange')}</Label><input name="capacity" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} style={inputStyle} required placeholder="e.g. 220 g" /></div>
+              <div style={{ gridColumn: '1 / -1' }}><Label>{t('location')}</Label><input name="location" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} style={inputStyle} required /></div>
             </div>
-            <button style={{ ...addBtn, marginTop: 16 }}>Save Instrument</button>
+            <button style={{ ...addBtn, marginTop: 16 }}>{t('saveInstrument')}</button>
           </form>
         </Card>
       )}
 
       {myInstruments.length === 0 ? (
-        <EmptyState message="You have not registered any instruments yet." />
+        <EmptyState message={t('noInstrumentsMsg')} />
       ) : (
         <Card>
-          <Table headers={['ID', 'Category', 'Manufacturer', 'Model', 'Serial No.', 'Capacity', 'Location', 'QR']}>
+          <Table headers={[t('tableId'), t('category'), t('manufacturer'), t('modelNumber'), t('serialNo'), t('capacityRange'), t('location'), t('qr')]}>
             {myInstruments.map(ins => {
               const cert = appCertificates.find(c => c.instrumentId === ins.id);
               return (

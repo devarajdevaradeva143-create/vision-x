@@ -1,20 +1,22 @@
 import { Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { PageHeader, Card, Table, StatusBadge, EmptyState } from '../../components/ui';
 import { fmt } from '../../utils/format';
 
 export default function OfficerInspections() {
   const { currentUser, appApplications, appInstruments } = useApp();
+  const { t } = useLanguage();
   const myApps = appApplications.filter(a => a.officerId === currentUser.id && (a.status === 'SCHEDULED' || a.status === 'INSPECTED'));
 
   return (
     <div>
-      <PageHeader title="Inspections" subtitle="Instruments scheduled or in progress for inspection" />
+      <PageHeader title={t('inspections')} subtitle={t('inspectionsSubtitle')} />
       {myApps.length === 0 ? (
-        <EmptyState message="No inspections scheduled or in progress." />
+        <EmptyState message={t('noInspectionsMsg')} />
       ) : (
         <Card>
-          <Table headers={['App ID', 'Instrument', 'Category', 'Scheduled', 'Status', '']}>
+          <Table headers={[t('appIdTable'), t('certInstrument'), t('instrumentCat'), t('scheduledTable'), t('statusTable'), '']}>
             {myApps.map(app => {
               const ins = appInstruments.find(i => i.id === app.instrumentId);
               return (
@@ -26,7 +28,7 @@ export default function OfficerInspections() {
                   <td style={{ padding: '12px 14px' }}><StatusBadge status={app.status} /></td>
                   <td style={{ padding: '12px 14px' }}>
                     <Link to={`/officer/applications/${app.id}`} style={{ color: '#0ea5e9', fontWeight: 600, fontSize: 13, textDecoration: 'none' }}>
-                      {app.status === 'SCHEDULED' ? 'Inspect' : 'Complete Decision'}
+                      {app.status === 'SCHEDULED' ? t('inspectBtn') : t('completeDecision')}
                     </Link>
                   </td>
                 </tr>

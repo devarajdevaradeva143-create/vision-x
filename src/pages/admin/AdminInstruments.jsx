@@ -1,15 +1,17 @@
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { PageHeader, Card, Table, EmptyState } from '../../components/ui';
 
 export default function AdminInstruments() {
   const { appInstruments, appUsers } = useApp();
+  const { t } = useLanguage();
 
   return (
     <div>
-      <PageHeader title="Instruments" subtitle="All registered weighing and measuring instruments" />
-      {appInstruments.length === 0 ? <EmptyState message="No instruments registered." /> : (
+      <PageHeader title={t('instruments')} subtitle={t('allInstrumentsSub')} />
+      {appInstruments.length === 0 ? <EmptyState message={t('noInstrumentsAdmin')} /> : (
         <Card>
-          <Table headers={['ID', 'Category', 'Manufacturer', 'Model', 'Serial No.', 'Capacity', 'Owner']}>
+          <Table headers={[t('tableId'), t('category'), t('manufacturer'), t('modelNumber'), t('serialNo'), t('capacityRange'), t('ownerCert')]}>
             {appInstruments.map(ins => {
               const owner = appUsers.find(u => u.id === ins.ownerId);
               return (

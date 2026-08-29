@@ -237,3 +237,36 @@ export function generateInstrumentId() {
   const num = instruments.length + 1;
   return `INS${String(num).padStart(3, '0')}`;
 }
+
+// ---------------------------------------------------------------------------
+// Public Complaints — linked to the EXACT certificate the citizen viewed.
+// A complaint always stores the reference keys (certificateId, applicationId,
+// instrumentId) so the whole chain stays connected:
+//   Instrument -> Certificate -> Complaint -> Inspection -> Action -> Resolution
+// ---------------------------------------------------------------------------
+
+export const complaintTypes = [
+  'Incorrect weight / measurement',
+  'Verification expired',
+  'Certificate not displayed',
+  'Instrument damaged',
+  'Suspected tampering',
+  'Instrument at an unregistered location',
+  'Overcharging / short weighing',
+  'Other',
+];
+
+export const complaintStatusFlow = ['PENDING', 'ASSIGNED', 'INSPECTION SCHEDULED', 'INSPECTED', 'ACTION TAKEN', 'RESOLVED'];
+
+export const complaints = [];
+
+// Complaint IDs continue after any runtime-created complaints (localStorage)
+// so they never collide, e.g. CMP-2026-00125.
+export function generateComplaintId() {
+  const runtime = (() => {
+    try { const raw = localStorage.getItem('lm_app_complaints'); if (raw) return JSON.parse(raw).length; } catch {}
+    return 0;
+  })();
+  const num = Math.max(complaints.length, runtime) + 1;
+  return `CMP-2026-${String(num).padStart(5, '0')}`;
+}

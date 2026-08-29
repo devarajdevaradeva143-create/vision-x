@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Card, PageHeader, StatusBadge, ProgressTracker, Field, DetailRow, Alert } from '../../components/ui';
 import { fmt } from '../../utils/format';
 import { generateCertificateId } from '../../data/mockData';
@@ -8,6 +9,7 @@ import { generateCertificateId } from '../../data/mockData';
 export default function OfficerApplicationDetail() {
   const { id } = useParams();
   const { currentUser, appApplications, appInstruments, appUsers, updateApplication, appCertificates, addCertificate } = useApp();
+  const { t } = useLanguage();
   const [scheduleDate, setScheduleDate] = useState('');
   const [readings, setReadings] = useState({});
   const [remarks, setRemarks] = useState('');
@@ -17,7 +19,7 @@ export default function OfficerApplicationDetail() {
   const [msg, setMsg] = useState(null);
 
   const app = appApplications.find(a => a.id === id);
-  if (!app) return <Card><p>Application not found.</p></Card>;
+  if (!app) return <Card><p>{t('applicationNotFound')}</p></Card>;
 
   const instrument = appInstruments.find(i => i.id === app.instrumentId);
   const owner = appUsers.find(u => u.id === app.ownerId);
@@ -40,7 +42,7 @@ export default function OfficerApplicationDetail() {
     } else {
       updateApplication(app.id, { scheduledDate: scheduleDate, status: 'SCHEDULED' });
     }
-    setMsg({ type: 'success', text: `Inspection scheduled for ${fmt(scheduleDate)}` });
+    setMsg({ type: 'success', text: t('inspectionScheduledMsg').replace('{date}', fmt(scheduleDate)) });
   };
 
   const issueCertificate = (result) => {
@@ -74,14 +76,14 @@ export default function OfficerApplicationDetail() {
     addCertificate(cert);
     updateApplication(app.id, { status: result, inspectionDate: new Date().toISOString().slice(0, 10) });
     setShowCertify(false);
-    setMsg({ type: result === 'CERTIFIED' ? 'success' : 'error', text: result === 'CERTIFIED' ? `Certificate ${cert.id} has been issued!` : 'Application has been REJECTED.' });
+    setMsg({ type: result === 'CERTIFIED' ? 'success' : 'error', text: result === 'CERTIFIED' ? t('certIssuedMsg').replace('{id}', cert.id) : t('appRejectedMsg') });
   };
 
   const commonReadings = [
-    { key: 'accuracy', label: 'Accuracy' },
-    { key: 'repeatability', label: 'Repeatability' },
-    { key: 'linearity', label: 'Linearity' },
-    { key: 'eccentricity', label: 'Eccentricity' },
+    { key: 'accuracy', label: t('accuracy') },
+    { key: 'repeatability', label: t('repeatability') },
+    { key: 'linearity', label: t('linearity') },
+    { key: 'eccentricity', label: t('eccentricity') },
   ];
 
   const handleReading = (k, v) => setReadings({ ...readings, [k]: v });
@@ -89,91 +91,91 @@ export default function OfficerApplicationDetail() {
   const saveInspection = () => {
     updateApplication(app.id, { status: 'INSPECTED', readings, remarks });
     setShowInspect(false);
-    setMsg({ type: 'success', text: 'Inspection readings recorded. Application moved to INSPECTED.' });
+    setMsg({ type: 'success', text: t('inspectionRecordedMsg') });
   };
 
   return (
     <div>
-      <PageHeader title={app.id} subtitle="Process verification application" action={<StatusBadge status={app.status} />} />
+      <PageHeader title={app.id} subtitle={t('processVerificationApp')} action={<StatusBadge status={app.status} />} />
 
       {msg && <div style={{ marginBottom: 16 }}><Alert type={msg.type}>{msg.text}</Alert></div>}
 
       <Card style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 13, color: '#475569', marginBottom: 10 }}>Application Status Flow</div>
+        <div style={{ fontSize: 13, color: '#475569', marginBottom: 10 }}>{t('applicationStatusFlow')}</div>
         <ProgressTracker status={app.status} />
       </Card>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <Card>
-          <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>Instrument</h3>
+          <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('instrument')}</h3>
           <DetailRow>
-            <Field label="Machine / Instrument Type" value={machineType} />
-            <Field label="Machine ID" value={app.instrumentId || '—'} />
-            <Field label="Manufacturer" value={manufacturer} />
-            <Field label="Model" value={model} />
-            <Field label="Serial No." value={serial} />
-            <Field label="Capacity" value={capacity} />
-            <Field label="Location" value={location} />
+            <Field label={t('instrumentType')} value={machineType} />
+            <Field label={t('machineId')} value={app.instrumentId || '—'} />
+            <Field label={t('manufacturer')} value={manufacturer} />
+            <Field label={t('model')} value={model} />
+            <Field label={t('serialNo')} value={serial} />
+            <Field label={t('capacityRange')} value={capacity} />
+            <Field label={t('location')} value={location} />
           </DetailRow>
         </Card>
         <Card>
-          <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>Owner</h3>
+          <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('owner')}</h3>
           <DetailRow>
-            <Field label="Name" value={owner?.name} />
-            <Field label="Email" value={owner?.email} />
-            <Field label="Phone" value={owner?.phone} />
-            <Field label="Address" value={owner?.address} />
+            <Field label={t('nameField')} value={owner?.name} />
+            <Field label={t('emailField')} value={owner?.email} />
+            <Field label={t('phoneField')} value={owner?.phone} />
+            <Field label={t('addressField')} value={owner?.address} />
           </DetailRow>
         </Card>
       </div>
 
       <Card style={{ marginTop: 16 }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>Application Details</h3>
+        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('applicationDetails')}</h3>
         <DetailRow>
-          <Field label="Application ID" value={app.id} />
-          <Field label="Application Date" value={fmt(app.submissionDate)} />
-          <Field label="Payment Status" value={app.paymentStatus === 'PAID' ? 'Paid' : 'Pending'} color={app.paymentStatus === 'PAID' ? '#22c55e' : '#f59e0b'} />
-          <Field label="Application Status" value={app.status} />
+          <Field label={t('appIdField')} value={app.id} />
+          <Field label={t('applicationDate')} value={fmt(app.submissionDate)} />
+          <Field label={t('paymentStatus')} value={app.paymentStatus === 'PAID' ? t('paid') : t('pending')} color={app.paymentStatus === 'PAID' ? '#22c55e' : '#f59e0b'} />
+          <Field label={t('applicationStatusField')} value={app.status} />
         </DetailRow>
       </Card>
 
       <Card style={{ marginTop: 16 }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>Inspection Actions</h3>
+        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('inspectionActions')}</h3>
 
         {app.status === 'SUBMITTED' && (
           <div>
-            <div style={{ fontSize: 14, color: '#475569', marginBottom: 10 }}>Review this application.</div>
-            <label style={{ fontWeight: 600, fontSize: 13, display: 'block', marginBottom: 6 }}>Schedule Inspection Date</label>
+            <div style={{ fontSize: 14, color: '#475569', marginBottom: 10 }}>{t('reviewThisApp')}</div>
+            <label style={{ fontWeight: 600, fontSize: 13, display: 'block', marginBottom: 6 }}>{t('scheduleInspectionDate')}</label>
             <input type="date" value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} style={input} />
-            <div style={{ marginTop: 12 }}><button onClick={handleSchedule} style={actionBtn}>Review & Schedule</button></div>
+            <div style={{ marginTop: 12 }}><button onClick={handleSchedule} style={actionBtn}>{t('reviewAndSchedule')}</button></div>
           </div>
         )}
 
         {app.status === 'SCHEDULED' && (
           <div>
             <div style={{ fontSize: 14, color: '#475569', marginBottom: 10 }}>
-              <b style={{ color: '#0f172a' }}>Scheduled inspection:</b> {fmt(app.scheduledDate)}. Record the inspection readings and results.
+              <b style={{ color: '#0f172a' }}>{t('scheduleInspectionDate')}:</b> {t('scheduledInspectionMsg').replace('{date}', fmt(app.scheduledDate))}
             </div>
             {!showInspect ? (
-              <button onClick={() => setShowInspect(true)} style={actionBtn}>Record Inspection Results</button>
+              <button onClick={() => setShowInspect(true)} style={actionBtn}>{t('recordInspectionResults')}</button>
             ) : (
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Verification Readings (enter values)</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>{t('verificationReadingsTitle')}</div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12 }}>
                   {commonReadings.map(r => (
                     <div key={r.key}>
                       <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>{r.label}</label>
-                      <input style={input} placeholder={r.key === 'accuracy' ? 'e.g. ±0.0001g' : 'e.g. Within limits'} value={readings[r.key] || ''} onChange={e => handleReading(r.key, e.target.value)} />
+                      <input style={input} placeholder={r.key === 'accuracy' ? 'e.g. ±0.0001g' : t('enterValues')} value={readings[r.key] || ''} onChange={e => handleReading(r.key, e.target.value)} />
                     </div>
                   ))}
                 </div>
                 <div style={{ marginTop: 12 }}>
-                  <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>Officer Remarks</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>{t('officerRemarks')}</label>
                   <textarea style={{ ...input, minHeight: 60 }} value={remarks} onChange={e => setRemarks(e.target.value)} placeholder="Inspection observations..." />
                 </div>
                 <div style={{ marginTop: 12, display: 'flex', gap: 10 }}>
-                  <button onClick={saveInspection} style={actionBtn}>Save as Inspected</button>
-                  <button onClick={() => setShowInspect(false)} style={cancelBtn}>Cancel</button>
+                  <button onClick={saveInspection} style={actionBtn}>{t('saveAsInspected')}</button>
+                  <button onClick={() => setShowInspect(false)} style={cancelBtn}>{t('cancelBtn')}</button>
                 </div>
               </div>
             )}
@@ -189,26 +191,26 @@ export default function OfficerApplicationDetail() {
                 ))}
               </div>
             ) : null}
-            <div style={{ fontSize: 13, color: '#475569', marginBottom: 8 }}><b>Remarks:</b> {app.remarks || '—'}</div>
+            <div style={{ fontSize: 13, color: '#475569', marginBottom: 8 }}><b>{t('remarks')}</b> {app.remarks || '—'}</div>
             <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: 14 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>Decision</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>{t('decision')}</div>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                 {!showCertify && (
                   <>
-                    <button onClick={() => { setShowCertify(true); }} style={{ ...actionBtn, background: '#22c55e' }}>Approve & Certify</button>
+                    <button onClick={() => { setShowCertify(true); }} style={{ ...actionBtn, background: '#22c55e' }}>{t('approveCertify')}</button>
                     <button onClick={() => {
                       updateApplication(app.id, { status: 'REJECTED', inspectionDate: new Date().toISOString().slice(0, 10) });
-                      setMsg({ type: 'error', text: 'Application has been REJECTED.' });
-                    }} style={{ ...actionBtn, background: '#ef4444' }}>Reject</button>
+                      setMsg({ type: 'error', text: t('appRejectedMsg') });
+                    }} style={{ ...actionBtn, background: '#ef4444' }}>{t('reject')}</button>
                   </>
                 )}
                 {showCertify && (
                   <div style={{ width: '100%', background: '#f8fafc', padding: 14, borderRadius: 8 }}>
-                    <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>Certificate Expiry Date (typically 1 year from issue)</label>
+                    <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>{t('certExpiryLabel')}</label>
                     <input type="date" value={expiry} onChange={e => setExpiry(e.target.value)} style={input} />
                     <div style={{ marginTop: 10, display: 'flex', gap: 10 }}>
-                      <button onClick={() => issueCertificate('CERTIFIED')} disabled={!expiry} style={actionBtn}>Generate Certificate</button>
-                      <button onClick={() => setShowCertify(false)} style={cancelBtn}>Cancel</button>
+                      <button onClick={() => issueCertificate('CERTIFIED')} disabled={!expiry} style={actionBtn}>{t('generateCertificate')}</button>
+                      <button onClick={() => setShowCertify(false)} style={cancelBtn}>{t('cancelBtn')}</button>
                     </div>
                   </div>
                 )}
@@ -222,13 +224,13 @@ export default function OfficerApplicationDetail() {
             {app.status === 'CERTIFIED' && certificate ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#22c55e' }}>Certificate <b>{certificate.id}</b> issued</div>
-                  <div style={{ fontSize: 13, color: '#475569' }}>Expires {fmt(certificate.expiryDate)}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#22c55e' }}>{t('certIssuedText').replace('{id}', certificate.id)}</div>
+                  <div style={{ fontSize: 13, color: '#475569' }}>{t('expires').replace('{date}', fmt(certificate.expiryDate))}</div>
                 </div>
-                <Link to={`/certificates/${app.id}`} style={actionBtn}>View / Print Certificate</Link>
+                <Link to={`/certificates/${app.id}`} style={actionBtn}>{t('viewPrintCert')}</Link>
               </div>
             ) : (
-              <Alert type="error">This application was rejected. Owner must repair and re-apply.</Alert>
+              <Alert type="error">{t('appRejectedText')}</Alert>
             )}
           </div>
         )}

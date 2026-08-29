@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { users, applications, certificates, instruments } from '../data/mockData';
+import { users, applications, certificates, instruments, complaints } from '../data/mockData';
 
 const AppContext = createContext(null);
 
@@ -20,6 +20,7 @@ export function AppProvider({ children }) {
   const [appApplications, setAppApplications] = usePersistedState('lm_app_applications', applications);
   const [appCertificates, setAppCertificates] = usePersistedState('lm_app_certificates', certificates);
   const [appInstruments, setAppInstruments] = usePersistedState('lm_app_instruments', instruments);
+  const [appComplaints, setAppComplaints] = usePersistedState('lm_app_complaints', complaints);
 
   const login = (email, password) => {
     const user = appUsers.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
@@ -79,6 +80,23 @@ export function AppProvider({ children }) {
   const updateInstrument = (id, updates) => setAppInstruments(prev => prev.map(i => i.id === id ? { ...i, ...updates } : i));
   const deleteInstrument = (id) => setAppInstruments(prev => prev.filter(i => i.id !== id));
 
+  const addComplaint = (complaint) => {
+    setAppComplaints(prev => [...prev, complaint]);
+  };
+
+  const updateComplaint = (id, updates) => {
+    setAppComplaints(prev => prev.map(c => {
+      if (c.id !== id) return c;
+      // Keep the nested officer 'progress' object merged so one PENDING ->
+      // RESOLVED update chain never loses previously saved officer notes.
+      const mergedProgress = updates.progress
+        ? { ...(c.progress || {}), ...updates.progress }
+        : c.progress;
+      const { progress, ...rest } = updates;
+      return { ...c, ...rest, progress: mergedProgress };
+    }));
+  };
+
   return (
     <AppContext.Provider value={{
       currentUser, login, logout, register,
@@ -86,6 +104,7 @@ export function AppProvider({ children }) {
       appApplications, addApplication, updateApplication,
       appCertificates, addCertificate,
       appInstruments, addInstrument, updateInstrument, deleteInstrument,
+      appComplaints, addComplaint, updateComplaint,
     }}>
       {children}
     </AppContext.Provider>

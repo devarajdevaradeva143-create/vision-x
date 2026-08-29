@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useParams } from 'react-router-dom';
+import { useSearchParams, useParams, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Field, DetailRow, Alert } from '../components/ui';
 import { fmt, expiryInfo } from '../utils/format';
 import { Scale, ShieldCheck, ShieldAlert, BadgeX, Ban } from 'lucide-react';
@@ -14,6 +15,7 @@ import { Scale, ShieldCheck, ShieldAlert, BadgeX, Ban } from 'lucide-react';
 
 export default function PublicVerify() {
   const { appCertificates } = useApp();
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [result, setResult] = useState(null);
   const [searched, setSearched] = useState(false);
@@ -59,8 +61,8 @@ export default function PublicVerify() {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#fff' }}>
             <Scale size={32} color="#38bdf8" />
             <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: 22, fontWeight: 800 }}>Certificate Verification</div>
-              <div style={{ fontSize: 13, color: '#94a3b8' }}>Legal Metrology Department</div>
+              <div style={{ fontSize: 22, fontWeight: 800 }}>{t('certificateVerification')}</div>
+              <div style={{ fontSize: 13, color: '#94a3b8' }}>{t('legalMetrologyDepartment')}</div>
             </div>
           </div>
         </div>
@@ -70,17 +72,17 @@ export default function PublicVerify() {
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Enter Certificate Number, Application or Instrument ID"
+              placeholder={t('enterCertPlaceholder')}
               style={{ flex: 1, padding: '14px 16px', border: '2px solid #cbd5e1', borderRadius: 10, fontSize: 15 }}
             />
-            <button style={searchBtn}>Verify</button>
+            <button style={searchBtn}>{t('verify')}</button>
           </form>
           <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 10 }}>
-            Try: <b>CERT-2026-001</b> (valid) · <b>CERT-2025-003</b> (expired)
+            {t('tryHint').replace('{a}', 'CERT-2026-001').replace('{b}', 'CERT-2025-003')}
           </div>
 
           {searched && !cert && result?.notFound && (
-            <Alert type="error">Certificate could not be verified.</Alert>
+            <Alert type="error">{t('certNotVerified')}</Alert>
           )}
           {cert && <CertificateResult cert={cert} />}
         </div>
@@ -90,21 +92,22 @@ export default function PublicVerify() {
 }
 
 // Compute the certificate status from the issued snapshot.
-function certStatus(cert) {
-  if (cert.status === 'REVOKED') return { label: 'REVOKED', color: '#ef4444', icon: <Ban size={26} />, sub: 'This certificate has been revoked.' };
-  if (cert.result === 'REJECTED' || cert.status === 'REJECTED') return { label: 'REJECTED', color: '#ef4444', icon: <BadgeX size={26} />, sub: 'Verification not approved.' };
+function certStatus(cert, t) {
+  if (cert.status === 'REVOKED') return { label: t('statusRevoked'), color: '#ef4444', icon: <Ban size={26} />, sub: t('statusRevokedSub') };
+  if (cert.result === 'REJECTED' || cert.status === 'REJECTED') return { label: t('statusRejected'), color: '#ef4444', icon: <BadgeX size={26} />, sub: t('statusRejectedSub') };
   const info = expiryInfo(cert.expiryDate);
-  if (info.status === 'expired') return { label: 'EXPIRED', color: '#ef4444', icon: <ShieldAlert size={26} />, sub: 'Certificate Expired.' };
-  if (info.status === 'expiring') return { label: 'EXPIRING SOON', color: '#f59e0b', icon: <ShieldAlert size={26} />, sub: `Certificate expires in ${info.days} day${info.days === 1 ? '' : 's'}.` };
-  return { label: 'VERIFIED / VALID', color: '#22c55e', icon: <ShieldCheck size={26} />, sub: 'Certificate is valid.' };
+  if (info.status === 'expired') return { label: t('statusExpired'), color: '#ef4444', icon: <ShieldAlert size={26} />, sub: t('certExpiredSub') };
+  if (info.status === 'expiring') return { label: t('statusExpiringSoon'), color: '#f59e0b', icon: <ShieldAlert size={26} />, sub: t('certExpiringSub').replace('{days}', info.days) };
+  return { label: t('statusValid'), color: '#22c55e', icon: <ShieldCheck size={26} />, sub: t('certValidSub') };
 }
 
 function CertificateResult({ cert }) {
   const { appUsers } = useApp();
-  const status = certStatus(cert);
-  const isExpired = status.label === 'EXPIRED' || status.label === 'EXPIRING SOON';
+  const { t } = useLanguage();
+  const status = certStatus(cert, t);
+  const isExpired = status.label === t('statusExpired') || status.label === t('statusExpiringSoon');
   const officer = appUsers.find(u => u.id === cert.officerId);
-  const revoked = status.label === 'REVOKED';
+  const revoked = status.label === t('statusRevoked');
 
   return (
     <div style={{ marginTop: 24 }}>
@@ -118,30 +121,39 @@ function CertificateResult({ cert }) {
         </div>
 
         <div style={{ padding: 20, background: '#fff' }}>
-          {revoked && <Alert type="error">Certificate Revoked.</Alert>}
+          {revoked && <Alert type="error">{t('certificateRevoked')}</Alert>}
           <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
-            Certificate Number: <b style={{ color: '#0f172a', fontSize: 14 }}>{cert.id}</b>
+            {t('certificateNumber')} <b style={{ color: '#0f172a', fontSize: 14 }}>{cert.id}</b>
           </div>
           <DetailRow>
-            <Field label="Certificate Status" value={status.label} color={status.color} />
-            <Field label="Application ID" value={cert.applicationId} />
-            <Field label="Owner Name" value={cert.ownerName} />
-            <Field label="Machine Type" value={cert.machineType} />
-            <Field label="Machine ID" value={cert.instrumentId} />
-            <Field label="Manufacturer" value={cert.manufacturer} />
-            <Field label="Model" value={cert.model} />
-            <Field label="Serial Number" value={cert.serialNumber} />
-            <Field label="Capacity" value={cert.capacity} />
-            <Field label="Location" value={cert.location} />
-            <Field label="Verification Date" value={fmt(cert.verificationDate)} />
-            <Field label="Issue Date" value={fmt(cert.issueDate)} />
-            <Field label="Expiry Date" value={fmt(cert.expiryDate)} color={isExpired ? status.color : undefined} />
-            <Field label="Verification Result" value={cert.result === 'CERTIFIED' ? 'VERIFIED & CERTIFIED' : 'REJECTED'} color={cert.result === 'CERTIFIED' ? '#22c55e' : '#ef4444'} />
-            <Field label="Officer / Tester" value={cert.officerName || officer?.name} />
+            <Field label={t('certificateStatus')} value={status.label} color={status.color} />
+            <Field label={t('applicationIdField')} value={cert.applicationId} />
+            <Field label={t('ownerName')} value={cert.ownerName} />
+            <Field label={t('machineTypeField')} value={cert.machineType} />
+            <Field label={t('machineOrInstrId')} value={cert.instrumentId} />
+            <Field label={t('manufacturer')} value={cert.manufacturer} />
+            <Field label={t('model')} value={cert.model} />
+            <Field label={t('serialNumber')} value={cert.serialNumber} />
+            <Field label={t('capacityRange')} value={cert.capacity} />
+            <Field label={t('location')} value={cert.location} />
+            <Field label={t('verificationDate')} value={fmt(cert.verificationDate)} />
+            <Field label={t('issueDate')} value={fmt(cert.issueDate)} />
+            <Field label={t('expiryDate')} value={fmt(cert.expiryDate)} color={isExpired ? status.color : undefined} />
+            <Field label={t('verificationResultField')} value={cert.result === 'CERTIFIED' ? t('verifiedCertified') : t('rejectedStatus')} color={cert.result === 'CERTIFIED' ? '#22c55e' : '#ef4444'} />
+            <Field label={t('officerTester')} value={cert.officerName || officer?.name} />
           </DetailRow>
 
-          <div style={{ marginTop: 20, paddingTop: 14, borderTop: '1px dashed #cbd5e1', textAlign: 'center', fontSize: 13, color: '#64748b' }}>
-            ✓ Verified from the Online Verification System
+          {/* Public complaint entry point — opens the complaint form with THIS
+              exact certificate already attached (via ?cert= number), so the
+              public user never re-enters or edits the certificate details. */}
+          <div style={{ marginTop: 20, textAlign: 'center' }}>
+            <Link to={`/report?cert=${cert.id}`} style={reportBtn}>
+              🚨 {t('reportProblem')}
+            </Link>
+          </div>
+
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px dashed #cbd5e1', textAlign: 'center', fontSize: 13, color: '#64748b' }}>
+            {t('verifiedFromSystem')}
           </div>
         </div>
       </div>
@@ -152,4 +164,9 @@ function CertificateResult({ cert }) {
 const searchBtn = {
   background: '#4f46e5', color: '#fff', padding: '0 28px', borderRadius: 10,
   fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
+};
+
+const reportBtn = {
+  display: 'inline-block', background: '#ef4444', color: '#fff', padding: '12px 24px',
+  borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none',
 };

@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { PageHeader, Card, Table, Alert } from '../../components/ui';
 
 export default function AdminUsers() {
   const { appUsers, addUser, updateUser, deleteUser } = useApp();
+  const { t } = useLanguage();
   const [filter, setFilter] = useState('ALL');
   const [showAdd, setShowAdd] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -17,19 +19,19 @@ export default function AdminUsers() {
       : form.role === 'officer' ? `OFF${String(appUsers.filter(u => u.role === 'officer').length + 1).padStart(3, '0')}`
       : `ADM${String(appUsers.filter(u => u.role === 'admin').length + 1).padStart(3, '0')}`;
     addUser({ id, ...form });
-    setMsg({ type: 'success', text: `${form.role.toUpperCase()} account created (${id}).` });
+    setMsg({ type: 'success', text: t('accountCreatedMsg').replace('{role}', form.role.toUpperCase()).replace('{id}', id) });
     setShowAdd(false);
     setForm({ name: '', email: '', password: '', role: 'owner', phone: '', department: '', address: '' });
   };
 
   const toggleActive = (user) => {
     updateUser(user.id, { active: !user.active });
-    setMsg({ type: 'success', text: `${user.name} ${user.active ? 'deactivated' : 'activated'}.` });
+    setMsg({ type: 'success', text: user.active ? t('deactivatedMsg').replace('{name}', user.name) : t('activatedMsg').replace('{name}', user.name) });
   };
 
   const setRole = (user, role) => {
     updateUser(user.id, { role });
-    setMsg({ type: 'success', text: `${user.name} role changed to ${role}.` });
+    setMsg({ type: 'success', text: t('roleChangedMsg').replace('{name}', user.name).replace('{role}', role) });
   };
 
   const input = { width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 14 };
@@ -38,34 +40,34 @@ export default function AdminUsers() {
   return (
     <div>
       <PageHeader
-        title="Manage Users"
-        subtitle="Owners, Government Officers and Administrators"
-        action={<button onClick={() => setShowAdd(!showAdd)} style={addBtn}>{showAdd ? 'Cancel' : '+ Add User'}</button>}
+        title={t('manageUsers')}
+        subtitle={t('manageUsersSub')}
+        action={<button onClick={() => setShowAdd(!showAdd)} style={addBtn}>{showAdd ? t('cancel') : t('addUser')}</button>}
       />
 
       {msg && <div style={{ marginBottom: 16 }}><Alert type={msg.type}>{msg.text}</Alert></div>}
 
       {showAdd && (
         <Card style={{ marginBottom: 20 }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: 16, color: '#0f172a' }}>Add New User</h3>
+          <h3 style={{ margin: '0 0 12px', fontSize: 16, color: '#0f172a' }}>{t('addNewUser')}</h3>
           <form onSubmit={handleAdd}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
-              <div><Label>Full Name</Label><input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={input} required /></div>
-              <div><Label>Email</Label><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} style={input} required /></div>
-              <div><Label>Password</Label><input value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} style={input} required /></div>
-              <div><Label>Role</Label>
+              <div><Label>{t('fullName')}</Label><input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={input} required /></div>
+              <div><Label>{t('email')}</Label><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} style={input} required /></div>
+              <div><Label>{t('password')}</Label><input value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} style={input} required /></div>
+              <div><Label>{t('role')}</Label>
                 <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} style={input}>
-                  <option value="owner">Owner</option>
-                  <option value="officer">Officer</option>
-                  <option value="admin">Admin</option>
+                  <option value="owner">{t('owner')}</option>
+                  <option value="officer">{t('officer')}</option>
+                  <option value="admin">{t('admin')}</option>
                 </select>
               </div>
-              <div><Label>Phone</Label><input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={input} /></div>
-              <div><Label>{form.role === 'owner' ? 'Address' : 'Department'}</Label>
+              <div><Label>{t('phoneField')}</Label><input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={input} /></div>
+              <div><Label>{form.role === 'owner' ? t('address') : t('department')}</Label>
                 <input value={form.role === 'owner' ? form.address : form.department} onChange={e => setForm({ ...form, [form.role === 'owner' ? 'address' : 'department']: e.target.value })} style={input} />
               </div>
             </div>
-            <button style={{ ...addBtn, marginTop: 16 }}>Create User</button>
+            <button style={{ ...addBtn, marginTop: 16 }}>{t('createUser')}</button>
           </form>
         </Card>
       )}
@@ -73,10 +75,10 @@ export default function AdminUsers() {
       <Card>
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           {['ALL', 'owner', 'officer', 'admin'].map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 14px', borderRadius: 999, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 600, cursor: 'pointer', background: filter === f ? '#4f46e5' : '#fff', color: filter === f ? '#fff' : '#475569', textTransform: 'capitalize' }}>{f}</button>
+            <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 14px', borderRadius: 999, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 600, cursor: 'pointer', background: filter === f ? '#4f46e5' : '#fff', color: filter === f ? '#fff' : '#475569', textTransform: 'capitalize' }}>{f === 'ALL' ? t('filterAll') : f}</button>
           ))}
         </div>
-        <Table headers={['ID', 'Name', 'Email', 'Role', 'Status', 'Actions']}>
+        <Table headers={[t('tableId'), t('nameTable'), t('email'), t('roleTable'), t('statusTableUser'), t('actions')]}>
           {filtered.map(user => (
             <tr key={user.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
               <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0ea5e9' }}>{user.id}</td>
@@ -90,12 +92,12 @@ export default function AdminUsers() {
                 </select>
               </td>
               <td style={{ padding: '12px 14px' }}>
-                <span style={{ fontWeight: 700, color: user.active !== false ? '#22c55e' : '#ef4444', fontSize: 12 }}>{user.active !== false ? 'Active' : 'Inactive'}</span>
+                <span style={{ fontWeight: 700, color: user.active !== false ? '#22c55e' : '#ef4444', fontSize: 12 }}>{user.active !== false ? t('active') : t('inactive')}</span>
               </td>
               <td style={{ padding: '12px 14px' }}>
-                <button onClick={() => toggleActive(user)} style={miniBtn}>{user.active !== false ? 'Deactivate' : 'Activate'}</button>
+                <button onClick={() => toggleActive(user)} style={miniBtn}>{user.active !== false ? t('deactivate') : t('activate')}</button>
                 {' '}
-                <button onClick={() => { deleteUser(user.id); setMsg({ type: 'success', text: `${user.name} deleted.` }); }} style={{ ...miniBtn, color: '#ef4444' }}>Delete</button>
+                <button onClick={() => { deleteUser(user.id); setMsg({ type: 'success', text: t('deletedMsg').replace('{name}', user.name) }); }} style={{ ...miniBtn, color: '#ef4444' }}>{t('delete')}</button>
               </td>
             </tr>
           ))}

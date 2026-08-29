@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { PageHeader, Card, StatusBadge } from '../../components/ui';
 import { fmt, daysUntil, expiryInfo } from '../../utils/format';
+import { Flag } from 'lucide-react';
 
 export default function OwnerDashboard() {
   const { currentUser, appApplications, appInstruments, appCertificates } = useApp();
+  const { t } = useLanguage();
 
   const myInstruments = appInstruments.filter(i => i.ownerId === currentUser.id);
   const myApps = appApplications.filter(a => a.ownerId === currentUser.id);
@@ -25,8 +28,8 @@ export default function OwnerDashboard() {
   return (
     <div>
       <PageHeader
-        title={`Welcome, ${currentUser.name.split(' ')[0]}`}
-        subtitle="Manage your instruments, applications and certificates"
+        title={t('welcomeOwner').replace('{name}', currentUser.name.split(' ')[0])}
+        subtitle={t('manageYourAssets')}
       />
 
       {activeAlerts.length > 0 && (
@@ -42,8 +45,8 @@ export default function OwnerDashboard() {
                 padding: '12px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,
               }}>
                 {info.status === 'expired'
-                  ? `Your ${ins?.category || 'instrument'} certificate (${cert.id}) has EXPIRED on ${fmt(cert.expiryDate)}. Please re-apply for verification immediately.`
-                  : `Your ${ins?.category || 'instrument'} certificate will expire in ${info.days} day${info.days === 1 ? '' : 's'} (on ${fmt(cert.expiryDate)}). Please schedule verification.`}
+                  ? t('certExpiredAlert').replace('{category}', ins?.category || t('instrument')).replace('{id}', cert.id).replace('{date}', fmt(cert.expiryDate))
+                  : t('certExpiringAlert').replace('{category}', ins?.category || t('instrument')).replace('{id}', cert.id).replace('{days}', info.days).replace('{s}', info.days === 1 ? '' : 's').replace('{date}', fmt(cert.expiryDate))}
               </div>
             );
           })}
@@ -51,19 +54,19 @@ export default function OwnerDashboard() {
       )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <Stat label="Instruments" value={myInstruments.length} color="#0ea5e9" />
-        <Stat label="Applications" value={myApps.length} color="#6366f1" />
-        <Stat label="Certified" value={countByStatus('CERTIFIED')} color="#22c55e" />
-        <Stat label="Certificates" value={myCerts.length} color="#f59e0b" />
+        <Stat label={t('statInstruments')} value={myInstruments.length} color="#0ea5e9" />
+        <Stat label={t('statApplications')} value={myApps.length} color="#6366f1" />
+        <Stat label={t('statCertified')} value={countByStatus('CERTIFIED')} color="#22c55e" />
+        <Stat label={t('statCertificates')} value={myCerts.length} color="#f59e0b" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <Card>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <h3 style={{ margin: 0, fontSize: 16, color: '#0f172a' }}>Recent Applications</h3>
-            <Link to="/applications" style={{ color: '#0ea5e9', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>View all</Link>
+            <h3 style={{ margin: 0, fontSize: 16, color: '#0f172a' }}>{t('recentApplications')}</h3>
+            <Link to="/applications" style={{ color: '#0ea5e9', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t('viewAll')}</Link>
           </div>
-          {myApps.length === 0 && <Empty text="No applications yet" />}
+          {myApps.length === 0 && <Empty text={t('noApplicationsYet')} />}
           <div style={{ display: 'grid', gap: 10 }}>
             {myApps.slice(0, 4).map(app => {
               const ins = appInstruments.find(i => i.id === app.instrumentId);
@@ -82,10 +85,10 @@ export default function OwnerDashboard() {
 
         <Card>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <h3 style={{ margin: 0, fontSize: 16, color: '#0f172a' }}>Certificates</h3>
-            <Link to="/certificates" style={{ color: '#0ea5e9', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>View all</Link>
+            <h3 style={{ margin: 0, fontSize: 16, color: '#0f172a' }}>{t('certificatesIssued')}</h3>
+            <Link to="/certificates" style={{ color: '#0ea5e9', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t('viewAll')}</Link>
           </div>
-          {myCerts.length === 0 && <Empty text="No certificates issued yet" />}
+          {myCerts.length === 0 && <Empty text={t('noCertificatesYet')} />}
           <div style={{ display: 'grid', gap: 10 }}>
             {myCerts.slice(0, 3).map(cert => {
               const info = expiryInfo(cert.expiryDate);
@@ -105,17 +108,29 @@ export default function OwnerDashboard() {
 
       {latestCert && (
         <Card style={{ marginTop: 16 }}>
-          <h3 style={{ margin: '0 0 6px', fontSize: 16, color: '#0f172a' }}>Latest Certificate</h3>
+          <h3 style={{ margin: '0 0 6px', fontSize: 16, color: '#0f172a' }}>{t('latestCertificate')}</h3>
           {latestCert ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
               <div style={{ color: '#64748b', fontSize: 14 }}>
-                <b style={{ color: '#0f172a' }}>{latestCert.category}</b> · Valid until {fmt(latestCert.expiryDate)}
+                <b style={{ color: '#0f172a' }}>{latestCert.category}</b> · {t('validUntil').replace('{date}', fmt(latestCert.expiryDate))}
               </div>
-              <Link to={`/certificates/${latestCert.applicationId}`} style={linkBtn}>View Certificate</Link>
+              <Link to={`/certificates/${latestCert.applicationId}`} style={linkBtn}>{t('viewCertificate')}</Link>
             </div>
           ) : null}
         </Card>
       )}
+
+      <Card style={{ marginTop: 16, borderLeft: '4px solid #ef4444' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Flag size={18} color="#ef4444" /> {t('reportProblem')}
+            </div>
+            <div style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>{t('reportProblemPromo')}</div>
+          </div>
+          <Link to="/report" style={complaintBtn}>{t('reportProblemShort')}</Link>
+        </div>
+      </Card>
     </div>
   );
 }
@@ -136,4 +151,9 @@ function Empty({ text }) {
 const linkBtn = {
   background: '#4f46e5', color: '#fff', padding: '8px 16px', borderRadius: 8,
   fontSize: 13, fontWeight: 600, textDecoration: 'none',
+};
+
+const complaintBtn = {
+  background: '#ef4444', color: '#fff', padding: '10px 18px', borderRadius: 8,
+  fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap',
 };
