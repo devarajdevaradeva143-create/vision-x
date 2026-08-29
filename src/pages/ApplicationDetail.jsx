@@ -38,7 +38,7 @@ export default function ApplicationDetail() {
   const verificationFee = typeInfo ? typeInfo.fee : 0;
   const qrValue = typeInfo ? qrDataFor(typeInfo) : '';
 
-  if (!app) return <Card><p>{t('applicationNotFound')}</p></Card>;
+  if (!app) return <Card><p className="text-sm text-gray-600">{t('applicationNotFound')}</p></Card>;
 
   const instrument = appInstruments.find(i => i.id === app.instrumentId);
   const owner = appUsers.find(u => u.id === app.ownerId);
@@ -59,96 +59,101 @@ export default function ApplicationDetail() {
     <div>
       <PageHeader title={app.id} subtitle={t('appDetailsStatus')} action={<StatusBadge status={app.status} />} />
 
-      <Card style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 13, color: '#475569', marginBottom: 10 }}>{t('applicationStatusFlow')}</div>
+      <Card className="mb-4">
+        <div className="mb-2.5 text-sm text-gray-700">{t('applicationStatusFlow')}</div>
         <ProgressTracker status={app.status} />
       </Card>
 
       {app.remarks && (app.status === 'REJECTED' || app.status === 'CERTIFIED') && (
-        <Card style={{ marginBottom: 16, background: app.status === 'REJECTED' ? '#fef2f2' : '#f0fdf4', borderColor: app.status === 'REJECTED' ? '#fecaca' : '#bbf7d0' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: app.status === 'REJECTED' ? '#b91c1c' : '#15803d', marginBottom: 6 }}>{t('officerRemarksPrefix')} — {app.status}</div>
-          <div style={{ fontSize: 14, color: '#334155' }}>{app.remarks}</div>
-        </Card>
+        <div className={`mb-4 rounded-lg border p-5 shadow-sm ${app.status === 'REJECTED' ? 'border-red-200 bg-red-100' : 'border-green-200 bg-green-100'}`}>
+          <div className={`mb-1.5 text-sm font-bold ${app.status === 'REJECTED' ? 'text-red-800' : 'text-green-800'}`}>{t('officerRemarksPrefix')} — {app.status}</div>
+          <div className="text-sm text-gray-700">{app.remarks}</div>
+        </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('applicationDetails')}</h3>
+          <h3 className="m-0 mb-4 text-base font-bold text-gray-800">{t('applicationDetails')}</h3>
           <DetailRow>
             <Field label={t('appIdField')} value={app.id} />
             <Field label={t('machineTypeField')} value={machineType} />
             <Field label={t('machineId')} value={instrument?.id || '—'} />
             <Field label={t('instrument')} value={instrument?.modelNumber || '—'} />
-            <Field label={t('verificationFee')} value={verificationFee ? `₹${verificationFee}` : '—'} color={verificationFee ? '#1d4ed8' : '#94a3b8'} />
-            <Field label={t('paymentStatus')} value={isPaid ? t('paid') : t('pendingPayment')} color={isPaid ? '#22c55e' : '#f59e0b'} />
+            <Field label={t('verificationFee')} value={verificationFee ? `₹${verificationFee}` : '—'} className={verificationFee ? 'text-blue-800' : ''} />
+            <Field label={t('paymentStatus')} value={isPaid ? t('paid') : t('pendingPayment')} className={isPaid ? 'text-green-800' : 'text-amber-800'} />
           </DetailRow>
         </Card>
 
         <Card>
-          <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('ownerOfficer')}</h3>
+          <h3 className="m-0 mb-4 text-base font-bold text-gray-800">{t('ownerOfficer')}</h3>
           <DetailRow>
             <Field label={t('ownerName')} value={owner?.name} />
             <Field label={t('ownerEmail')} value={owner?.email} />
             <Field label={t('ownerPhone')} value={owner?.phone} />
-            <Field label={t('officer')} value={officer?.name || t('assignedAfterPayment')} color={officer ? undefined : '#94a3b8'} />
+            <Field label={t('officer')} value={officer?.name || t('assignedAfterPayment')} className={officer ? '' : 'text-gray-400'} />
           </DetailRow>
         </Card>
       </div>
 
       {/* ------------------- PAYMENT SECTION ------------------- */}
-      <Card style={{ marginTop: 16 }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('paymentSection')}</h3>
+      <Card className="mt-4">
+        <h3 className="m-0 mb-4 text-base font-bold text-gray-800">{t('paymentSection')}</h3>
 
         {isPaid ? (
-          <div style={{ textAlign: 'center', padding: 20, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10 }}>
-            <div style={{ fontSize: 32 }}>✓</div>
-            <div style={{ fontWeight: 800, color: '#15803d', fontSize: 16 }}>{t('paymentCompleted')}</div>
-            <div style={{ fontSize: 13, color: '#475569', marginTop: 6 }}>
+          <div className="rounded-md border border-green-200 bg-green-100 px-5 py-5 text-center">
+            <div className="text-3xl">✓</div>
+            <div className="text-base font-bold text-green-800">{t('paymentCompleted')}</div>
+            <div className="mt-1.5 text-sm text-gray-700">
               {t('paymentCompletedMsg').replace('{fee}', verificationFee).replace('{type}', machineType)}
             </div>
           </div>
         ) : (
           <div>
-            <Field label={t('verificationFee')} value={`₹${verificationFee}`} color="#1d4ed8" />
-            <div style={{ marginTop: 16 }}>
-              <button onClick={() => setShowPayment(!showPayment)} style={showPayment ? cancelBtn : payBtn}>
+            <Field label={t('verificationFee')} value={`₹${verificationFee}`} className="text-blue-800" />
+            <div className="mt-4">
+              <button
+                onClick={() => setShowPayment(!showPayment)}
+                className={showPayment
+                  ? 'cursor-pointer rounded-md border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100'
+                  : 'cursor-pointer rounded-md bg-blue-800 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-900'}
+              >
                 {showPayment ? t('cancel') : t('pay').replace('{fee}', verificationFee)}
               </button>
             </div>
 
             {showPayment && (
-              <div style={{ textAlign: 'center', marginTop: 20, padding: 20, border: '1px solid #e2e8f0', borderRadius: 10, background: '#f8fafc' }}>
-                <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: 4 }}>{t('verificationFee')}: ₹{verificationFee}</div>
-                <div style={{ fontSize: 13, color: '#64748b' }}>{t('scanQr')}</div>
+              <div className="mt-5 rounded-md border border-gray-200 bg-gray-50 px-4 py-5 text-center">
+                <div className="font-bold text-gray-800">{t('verificationFee')}: ₹{verificationFee}</div>
+                <div className="text-sm text-gray-600">{t('scanQr')}</div>
 
                 {/* Unique QR for this application's machine type */}
-                <div style={{ display: 'inline-block', padding: 10, background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10, marginTop: 12 }}>
+                <div className="mt-3 inline-block rounded-md border border-gray-200 bg-white p-2.5">
                   <QRCodeSVG value={qrValue || ' '} size={160} />
                 </div>
 
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', marginTop: 14 }}>{t('amount').replace('{fee}', verificationFee)}</div>
-                <div style={{ marginTop: 8, fontSize: 13, color: '#f59e0b', fontWeight: 600 }}>{t('paymentStatusPending')}</div>
+                <div className="mt-3.5 text-sm font-bold text-gray-800">{t('amount').replace('{fee}', verificationFee)}</div>
+                <div className="mt-2 text-sm font-semibold text-amber-800">{t('paymentStatusPending')}</div>
 
-                <button onClick={completePayment} style={completeBtn}>{t('paymentCompletedBtn')}</button>
+                <button onClick={completePayment} className="mt-4 cursor-pointer rounded-md bg-green-700 px-5 py-3 text-sm font-semibold text-white hover:bg-green-800">{t('paymentCompletedBtn')}</button>
               </div>
             )}
           </div>
         )}
       </Card>
 
-      <Card style={{ marginTop: 16 }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('schedule')}</h3>
+      <Card className="mt-4">
+        <h3 className="m-0 mb-4 text-base font-bold text-gray-800">{t('schedule')}</h3>
         <DetailRow>
           <Field label={t('submissionDate')} value={fmt(app.submissionDate)} />
-          <Field label={t('scheduledInspection')} value={app.scheduledDate ? fmt(app.scheduledDate) : t('notScheduled')} color={app.scheduledDate ? undefined : '#f59e0b'} />
+          <Field label={t('scheduledInspection')} value={app.scheduledDate ? fmt(app.scheduledDate) : t('notScheduled')} className={app.scheduledDate ? '' : 'text-amber-800'} />
           <Field label={t('actualInspectionDate')} value={app.inspectionDate ? fmt(app.inspectionDate) : '—'} />
         </DetailRow>
       </Card>
 
       {app.readings && (
-        <Card style={{ marginTop: 16 }}>
-          <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('verificationReadings')}</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px,1fr))', gap: 16 }}>
+        <Card className="mt-4">
+          <h3 className="m-0 mb-4 text-base font-bold text-gray-800">{t('verificationReadings')}</h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(app.readings).map(([k, v]) => (
               <Field key={k} label={k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())} value={v} />
             ))}
@@ -157,31 +162,14 @@ export default function ApplicationDetail() {
       )}
 
       {certificate && (
-        <Card style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Card className="mt-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <div style={{ fontSize: 13, color: '#22c55e', fontWeight: 700 }}>{t('certified')}</div>
-            <div style={{ fontSize: 14, color: '#475569' }}>{t('certificateIssuedOn').replace('{id}', certificate.id).replace('{date}', fmt(certificate.issueDate))}</div>
+            <div className="text-sm font-bold text-green-800">{t('certified')}</div>
+            <div className="text-sm text-gray-700">{t('certificateIssuedOn').replace('{id}', certificate.id).replace('{date}', fmt(certificate.issueDate))}</div>
           </div>
-          <Link to={`/certificates/${app.id}`} style={viewBtn}>{t('viewCertificate')}</Link>
+          <Link to={`/certificates/${app.id}`} className="rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">{t('viewCertificate')}</Link>
         </Card>
       )}
     </div>
   );
 }
-
-const payBtn = {
-  background: '#4f46e5', color: '#fff', padding: '12px 22px', borderRadius: 8,
-  fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer',
-};
-const cancelBtn = {
-  background: '#f1f5f9', color: '#334155', padding: '12px 22px', borderRadius: 8,
-  fontSize: 14, fontWeight: 700, border: '1px solid #e2e8f0', cursor: 'pointer',
-};
-const completeBtn = {
-  background: '#22c55e', color: '#fff', padding: '12px 22px', borderRadius: 8,
-  fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', marginTop: 16,
-};
-const viewBtn = {
-  background: '#4f46e5', color: '#fff', padding: '10px 18px', borderRadius: 8,
-  fontSize: 13, fontWeight: 700, textDecoration: 'none',
-};

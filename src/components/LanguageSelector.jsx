@@ -35,34 +35,24 @@ export default function LanguageSelector() {
   const options = LANGUAGES.filter(l => l.code !== language);
 
   return (
-    <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
+    <div ref={ref} className="relative inline-block">
       <button
         onClick={() => setOpen(o => !o)}
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '8px 12px', background: '#1e293b', color: '#e2e8f0',
-          border: '1px solid #334155', borderRadius: 8, cursor: 'pointer',
-          fontSize: 13, fontWeight: 600,
-        }}
+        className="inline-flex items-center gap-2 rounded-md border border-blue-700 bg-blue-800 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
       >
-        <Globe size={16} color="#38bdf8" />
+        <Globe size={16} className="text-amber-400" />
         <span>{current.label}</span>
-        <span style={{ fontSize: 10, color: '#94a3b8' }}>▼</span>
+        <span className="text-[10px] text-blue-200">▼</span>
       </button>
 
       {open && (
-        <div style={{
-          position: 'absolute', right: 0, top: 'calc(100% + 6px)',
-          background: '#0f172a', border: '1px solid #334155', borderRadius: 10,
-          minWidth: 160, boxShadow: '0 10px 30px rgba(0,0,0,0.4)', zIndex: 50,
-          overflow: 'hidden', padding: 4,
-        }}>
-          <div style={{ padding: '6px 12px', fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        <div className="absolute right-0 top-[calc(100%+6px)] z-50 min-w-40 overflow-hidden rounded-md border border-blue-800 bg-blue-900 p-1 shadow-sm">
+          <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-blue-300">
             {t('language')}
           </div>
           <button
             onClick={() => { setLanguage(current.code); setOpen(false); }}
-            style={optionStyle(true)}
+            className={optionClass(true)}
           >
             {current.label}
           </button>
@@ -70,7 +60,7 @@ export default function LanguageSelector() {
             <button
               key={l.code}
               onClick={() => { setLanguage(l.code); setOpen(false); }}
-              style={optionStyle(false)}
+              className={optionClass(false)}
             >
               {l.label}
             </button>
@@ -81,9 +71,5 @@ export default function LanguageSelector() {
   );
 }
 
-const optionStyle = (active) => ({
-  display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px',
-  background: active ? 'rgba(56,189,248,0.12)' : 'transparent', color: '#e2e8f0',
-  border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600,
-  margin: 0,
-});
+const optionClass = (active) =>
+  `block w-full rounded-md px-3 py-2 text-left text-xs font-semibold ${active ? 'bg-blue-800 text-white' : 'text-blue-100 hover:bg-blue-800 hover:text-white'}`;

@@ -65,47 +65,47 @@ export default function OwnerApplications() {
       <PageHeader
         title={t('applications')}
         subtitle={t('submitAppsSubtitle')}
-        action={<button onClick={() => setShowForm(!showForm)} style={addBtn}>{showForm ? t('cancel') : t('newApplication')}</button>}
+        action={<button onClick={() => setShowForm(!showForm)} className="cursor-pointer rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">{showForm ? t('cancel') : t('newApplication')}</button>}
       />
 
       {showForm && (
-        <Card style={{ marginBottom: 20 }}>
-          <h3 style={{ margin: '0 0 8px', fontSize: 16, color: '#0f172a' }}>{t('submitVerificationApplication')}</h3>
-          <p style={{ margin: '0 0 12px', color: '#64748b', fontSize: 13 }}>{t('selectMachineHint')}</p>
-          {error && <Alert type="error">{error}</Alert>}
+        <Card className="mb-5">
+          <h3 className="m-0 mb-2 text-base font-bold text-gray-800">{t('submitVerificationApplication')}</h3>
+          <p className="m-0 mb-3 text-sm text-gray-600">{t('selectMachineHint')}</p>
+          {error && <div className="mb-3"><Alert type="error">{error}</Alert></div>}
 
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>{t('machineType')}</div>
-          <select value={machineType} onChange={e => { setMachineType(e.target.value); setError(''); }} style={selectStyle}>
+          <div className="mb-1.5 text-sm font-medium text-gray-700">{t('machineType')}</div>
+          <select value={machineType} onChange={e => { setMachineType(e.target.value); setError(''); }} className={selectStyle}>
             <option value="">{t('selectMachineType')}</option>
             {machineTypes.map(m => <option key={m.id} value={m.name}>{m.name} — ₹{m.fee}</option>)}
           </select>
 
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#334155', margin: '14px 0 6px' }}>{t('instrumentOptional')}</div>
-          <select value={selectedInstrument} onChange={e => setSelectedInstrument(e.target.value)} style={selectStyle}>
+          <div className="mb-1.5 mt-3.5 text-sm font-medium text-gray-700">{t('instrumentOptional')}</div>
+          <select value={selectedInstrument} onChange={e => setSelectedInstrument(e.target.value)} className={selectStyle}>
             <option value="">{t('noInstrumentOpt')}</option>
             {myInstruments.map(ins => <option key={ins.id} value={ins.id}>{ins.category} — {ins.modelNumber} ({ins.id})</option>)}
           </select>
 
           {!selectedInstrument && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+            <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2">
               {[['manufacturer', t('manufacturer')], ['modelNumber', t('modelNumber')], ['serialNumber', t('serialNumber')], ['capacity', t('capacityRange')], ['location', t('location')]].map(([key, label]) => (
-                <div key={key} style={key === 'location' ? { gridColumn: '1 / -1' } : {}}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }}>{label}</div>
-                  <input value={details[key]} onChange={e => setDetails(d => ({ ...d, [key]: e.target.value }))} style={selectStyle} placeholder={`e.g. ${key === 'location' ? 'Mumbai Central Lab' : key === 'capacity' ? '220 g' : 'Mettler Toledo'}`} />
+                <div key={key} className={key === 'location' ? 'sm:col-span-2' : ''}>
+                  <div className="mb-1 text-sm font-medium text-gray-700">{label}</div>
+                  <input value={details[key]} onChange={e => setDetails(d => ({ ...d, [key]: e.target.value }))} className={selectStyle} placeholder={`e.g. ${key === 'location' ? 'Mumbai Central Lab' : key === 'capacity' ? '220 g' : 'Mettler Toledo'}`} />
                 </div>
               ))}
             </div>
           )}
 
           {machineType && (
-            <div style={{ marginTop: 14, background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: 12, fontSize: 14, color: '#1e40af' }}>
-              {t('machineType')}: <b style={{ color: '#0f172a' }}>{machineType}</b><br />
-              {t('feeForType')}<b style={{ color: '#1d4ed8' }}>₹{feeForType}</b>
+            <div className="mt-3.5 rounded-md border border-blue-200 bg-blue-100 px-3.5 py-3 text-sm text-blue-800">
+              {t('machineType')}: <b className="text-gray-800">{machineType}</b><br />
+              {t('feeForType')}<b className="text-blue-900">₹{feeForType}</b>
             </div>
           )}
 
-          <div style={{ marginTop: 14 }}>
-            <button onClick={submitApplication} style={addBtn}>{t('submitApplication')}</button>
+          <div className="mt-3.5">
+            <button onClick={submitApplication} className="cursor-pointer rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">{t('submitApplication')}</button>
           </div>
         </Card>
       )}
@@ -116,18 +116,18 @@ export default function OwnerApplications() {
         <Card>
           <Table headers={[t('appId'), t('machineType'), t('submitted'), t('scheduled'), t('payment'), t('status'), '']}>
             {myApps.map(app => (
-              <tr key={app.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0f172a' }}>{app.id}</td>
-                <td style={{ padding: '12px 14px', color: '#475569' }}>{app.machineType}</td>
-                <td style={{ padding: '12px 14px', color: '#475569' }}>{fmt(app.submissionDate)}</td>
-                <td style={{ padding: '12px 14px', color: app.scheduledDate ? '#475569' : '#94a3b8' }}>{app.scheduledDate ? fmt(app.scheduledDate) : t('notScheduled')}</td>
-                <td style={{ padding: '12px 14px' }}>
-                  <span style={{ fontWeight: 700, fontSize: 12, color: app.paymentStatus === 'PAID' ? '#22c55e' : '#f59e0b' }}>
+              <tr key={app.id} className="border-b border-gray-100">
+                <td className="px-4 py-3 text-sm font-bold text-gray-800">{app.id}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">{app.machineType}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">{fmt(app.submissionDate)}</td>
+                <td className={`px-4 py-3 text-sm ${app.scheduledDate ? 'text-gray-700' : 'text-gray-400'}`}>{app.scheduledDate ? fmt(app.scheduledDate) : t('notScheduled')}</td>
+                <td className="px-4 py-3">
+                  <span className={`text-xs font-bold ${app.paymentStatus === 'PAID' ? 'text-green-800' : 'text-amber-800'}`}>
                     {app.paymentStatus === 'PAID' ? t('paid') : t('pending')}
                   </span>
                 </td>
-                <td style={{ padding: '12px 14px' }}><StatusBadge status={app.status} /></td>
-                <td style={{ padding: '12px 14px' }}><Link to={`/applications/${app.id}`} style={viewBtn}>{t('view')}</Link></td>
+                <td className="px-4 py-3"><StatusBadge status={app.status} /></td>
+                <td className="px-4 py-3"><Link to={`/applications/${app.id}`} className="text-sm font-medium text-blue-800 hover:text-blue-900">{t('view')}</Link></td>
               </tr>
             ))}
           </Table>
@@ -137,16 +137,4 @@ export default function OwnerApplications() {
   );
 }
 
-const addBtn = {
-  background: '#4f46e5', color: '#fff', padding: '10px 18px', borderRadius: 8,
-  fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
-};
-
-const viewBtn = {
-  color: '#0ea5e9', fontWeight: 600, fontSize: 13, textDecoration: 'none',
-};
-
-const selectStyle = {
-  padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: 8,
-  fontSize: 14, width: '100%', maxWidth: 480,
-};
+const selectStyle = 'w-full max-w-md rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-700 focus:outline-none';

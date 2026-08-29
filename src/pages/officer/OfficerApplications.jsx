@@ -22,12 +22,17 @@ export default function OfficerApplications() {
     <div>
       <PageHeader title={t('applications')} subtitle={t('reviewScheduleProcess')} />
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div className="mb-5 flex flex-wrap gap-2">
         {filters.map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
-            padding: '8px 16px', borderRadius: 999, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 600,
-            cursor: 'pointer', background: filter === f ? '#4f46e5' : '#fff', color: filter === f ? '#fff' : '#475569',
-          }}>{f === 'ALL' ? t('filterAll') : f}</button>
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={
+              filter === f
+                ? 'cursor-pointer rounded-md bg-blue-800 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-900'
+                : 'cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100'
+            }
+          >{f === 'ALL' ? t('filterAll') : f}</button>
         ))}
       </div>
 
@@ -40,15 +45,15 @@ export default function OfficerApplications() {
               const machineType = app.machineType || appInstruments.find(i => i.id === app.instrumentId)?.category;
               const owner = appUsers.find(u => u.id === app.ownerId);
               return (
-                <tr key={app.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0f172a' }}>{app.id}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{machineType}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{owner?.name}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{fmt(app.submissionDate)}</td>
-                  <td style={{ padding: '12px 14px', color: app.scheduledDate ? '#475569' : '#94a3b8' }}>{app.scheduledDate ? fmt(app.scheduledDate) : '—'}</td>
-                  <td style={{ padding: '12px 14px' }}><StatusBadge status={app.status} /></td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <Link to={`/officer/applications/${app.id}`} style={{ color: '#0ea5e9', fontWeight: 600, fontSize: 13, textDecoration: 'none' }}>
+                <tr key={app.id} className="border-b border-gray-100">
+                  <td className="px-4 py-3 text-sm font-bold text-gray-800">{app.id}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{machineType}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{owner?.name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{fmt(app.submissionDate)}</td>
+                  <td className={`px-4 py-3 text-sm ${app.scheduledDate ? 'text-gray-700' : 'text-gray-400'}`}>{app.scheduledDate ? fmt(app.scheduledDate) : '—'}</td>
+                  <td className="px-4 py-3"><StatusBadge status={app.status} /></td>
+                  <td className="px-4 py-3">
+                    <Link to={`/officer/applications/${app.id}`} className="text-sm font-medium text-blue-800 hover:text-blue-900">
                       {app.status === 'SUBMITTED' ? t('reviewBtn') : app.status === 'SCHEDULED' ? t('inspectBtn') : t('viewLink')}
                     </Link>
                   </td>

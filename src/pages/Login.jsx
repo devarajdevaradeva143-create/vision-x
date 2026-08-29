@@ -21,53 +21,70 @@ export default function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <div style={{ width: '100%', maxWidth: 900, display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
-        <div style={{ background: 'linear-gradient(135deg,#0ea5e9,#4f46e5)', color: '#fff', padding: 40, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-            <Scale size={40} />
-            <div>
-              <div style={{ fontWeight: 800, fontSize: 20 }}>Legal Metrology</div>
-              <div style={{ fontSize: 13, opacity: 0.9 }}>Instrument Verification System</div>
-            </div>
-          </div>
-          <h1 style={{ fontSize: 26, margin: '20px 0 12px', lineHeight: 1.2 }}>Digital Verification & Certification of Weighing & Measuring Instruments</h1>
-          <p style={{ opacity: 0.9, fontSize: 14, lineHeight: 1.6 }}>
-            A National prototype connecting instrument owners, government officers and the public through a transparent verification workflow.
-          </p>
-          <div style={{ marginTop: 20, display: 'flex', gap: 10, flexWrap: 'wrap', fontSize: 12 }}>
-            {['Owner', 'Officer', 'Admin', 'Public Verify'].map(r => (
-              <span key={r} style={{ background: 'rgba(255,255,255,0.15)', padding: '4px 12px', borderRadius: 999 }}>{r}</span>
-            ))}
-          </div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4 sm:p-6">
+      <div className="w-full max-w-4xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+        {/* Government accent band */}
+        <div className="flex h-1.5">
+          <div className="flex-1 bg-blue-800" />
+          <div className="flex-1 bg-amber-400" />
+          <div className="flex-1 bg-green-700" />
         </div>
 
-        <div style={{ padding: 40 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: '0 0 6px' }}>Login</h2>
-          <p style={{ color: '#64748b', fontSize: 13, margin: '0 0 24px' }}>Sign in to access your dashboard</p>
-
-          {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '10px', borderRadius: 8, display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, marginBottom: 16 }}><AlertCircle size={16} /> {error}</div>}
-
-          <form onSubmit={handleSubmit}>
-            <Label>Email</Label>
-            <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
-
-            <Label>Password</Label>
-            <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
-
-            <button style={submitBtn}>Sign In</button>
-          </form>
-
-          <div style={{ marginTop: 16, fontSize: 13 }}>
-            New owner? <Link to="/register" style={{ color: '#0ea5e9', fontWeight: 700 }}>Register here</Link>
+        <div className="grid md:grid-cols-2">
+          <div className="flex flex-col justify-center bg-blue-900 p-8 text-white lg:p-10">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-800 text-amber-400">
+                <Scale size={32} />
+              </div>
+              <div>
+                <div className="text-lg font-bold">Legal Metrology</div>
+                <div className="text-sm text-blue-200">Instrument Verification System</div>
+              </div>
+            </div>
+            <h1 className="mt-3 text-xl leading-snug font-bold lg:text-2xl">Digital Verification & Certification of Weighing & Measuring Instruments</h1>
+            <p className="mt-3 text-sm leading-relaxed text-blue-100">
+              A National prototype connecting instrument owners, government officers and the public through a transparent verification workflow.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2 text-xs">
+              {['Owner', 'Officer', 'Admin', 'Public Verify'].map(r => (
+                <span key={r} className="rounded-md bg-blue-800 px-3 py-1 font-medium text-blue-100">{r}</span>
+              ))}
+            </div>
           </div>
 
-          <div style={{ marginTop: 28, background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: 16, fontSize: 12, color: '#475569' }}>
-            <div style={{ fontWeight: 700, marginBottom: 8 }}>Demo Accounts</div>
-            <div style={{ display: 'grid', gap: 4 }}>
-              <DemoRow role="Owner" email="rajesh@example.com" pass="owner123" />
-              <DemoRow role="Officer" email="vikram@gov.in" pass="officer123" />
-              <DemoRow role="Admin" email="admin@gov.in" pass="admin123" />
+          <div className="p-6 sm:p-8 lg:p-10">
+            <h2 className="m-0 text-lg font-bold text-gray-800">Login</h2>
+            <p className="mt-1 mb-5 text-sm text-gray-600">Sign in to access your dashboard</p>
+
+            {error && (
+              <div className="mb-4 flex items-center gap-2 rounded-md border border-red-200 bg-red-100 px-3 py-2.5 text-sm text-red-800">
+                <AlertCircle size={16} /> {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <Label>Email</Label>
+              <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+
+              <Label>Password</Label>
+              <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+
+              <button className="mt-5 w-full cursor-pointer rounded-md bg-blue-800 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-900">
+                Sign In
+              </button>
+            </form>
+
+            <div className="mt-4 text-sm">
+              New owner? <Link to="/register" className="font-semibold text-blue-800 hover:text-blue-900">Register here</Link>
+            </div>
+
+            <div className="mt-6 rounded-md border border-gray-200 bg-gray-50 p-4 text-xs text-gray-600">
+              <div className="mb-2 font-semibold text-gray-800">Demo Accounts</div>
+              <div className="grid gap-1">
+                <DemoRow role="Owner" email="rajesh@example.com" pass="owner123" />
+                <DemoRow role="Officer" email="vikram@gov.in" pass="officer123" />
+                <DemoRow role="Admin" email="admin@gov.in" pass="admin123" />
+              </div>
             </div>
           </div>
         </div>
@@ -77,18 +94,14 @@ export default function Login() {
 }
 
 function DemoRow({ role, email, pass }) {
-  return <div><b style={{ color: '#0f172a' }}>{role}:</b> {email} / {pass}</div>;
+  return <div><b className="text-gray-800">{role}:</b> {email} / {pass}</div>;
 }
 
 function Label({ children }) {
-  return <div style={{ fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6, marginTop: 14 }}>{children}</div>;
+  return <div className="mb-1.5 mt-3 text-sm font-semibold text-gray-700">{children}</div>;
 }
 
 function Input(props) {
-  return <input {...props} style={{ width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 14 }} />;
+  const { className, ...rest } = props;
+  return <input {...rest} className={`w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-700 focus:outline-none ${className || ''}`} />;
 }
-
-const submitBtn = {
-  width: '100%', padding: '12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8,
-  fontSize: 15, fontWeight: 700, cursor: 'pointer', marginTop: 24,
-};

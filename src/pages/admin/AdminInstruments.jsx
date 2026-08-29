@@ -15,14 +15,14 @@ export default function AdminInstruments() {
             {appInstruments.map(ins => {
               const owner = appUsers.find(u => u.id === ins.ownerId);
               return (
-                <tr key={ins.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0ea5e9' }}>{ins.id}</td>
-                  <td style={{ padding: '12px 14px' }}>{ins.category}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.manufacturer}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.modelNumber}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.serialNumber}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.capacity}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{owner?.name || '—'}</td>
+                <tr key={ins.id} className="border-b border-gray-100">
+                  <td className="px-4 py-3 text-sm font-bold text-blue-800">{ins.id}</td>
+                  <td className="px-4 py-3 text-sm text-gray-800">{ins.category}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{ins.manufacturer}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{ins.modelNumber}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{ins.serialNumber}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{ins.capacity}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{owner?.name || '—'}</td>
                 </tr>
               );
             })}

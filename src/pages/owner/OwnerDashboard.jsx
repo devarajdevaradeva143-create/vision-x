@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { PageHeader, Card, StatusBadge } from '../../components/ui';
-import { fmt, daysUntil, expiryInfo } from '../../utils/format';
+import { fmt, expiryInfo } from '../../utils/format';
 import { Flag } from 'lucide-react';
 
 export default function OwnerDashboard() {
@@ -25,6 +25,12 @@ export default function OwnerDashboard() {
 
   const countByStatus = (s) => myApps.filter(a => a.status === s).length;
 
+  const validityClass = (info) => {
+    if (info.status === 'expired') return 'text-red-800';
+    if (info.status === 'expiring') return 'text-amber-800';
+    return 'text-green-800';
+  };
+
   return (
     <div>
       <PageHeader
@@ -33,18 +39,18 @@ export default function OwnerDashboard() {
       />
 
       {activeAlerts.length > 0 && (
-        <div style={{ marginBottom: 24, display: 'grid', gap: 8 }}>
+        <div className="mb-6 grid gap-2">
           {activeAlerts.map(({ cert, info }) => {
             const ins = appInstruments.find(i => i.id === cert.instrumentId);
+            const expired = info.status === 'expired';
             return (
-              <div key={cert.id} style={{
-                background: info.status === 'expired' ? '#fef2f2' : '#fffbeb',
-                border: `1px solid ${info.status === 'expired' ? '#fecaca' : '#fde68a'}`,
-                borderLeft: `5px solid ${info.color}`,
-                color: info.status === 'expired' ? '#b91c1c' : '#b45309',
-                padding: '12px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,
-              }}>
-                {info.status === 'expired'
+              <div
+                key={cert.id}
+                className={`border-l-4 rounded-md px-4 py-3 text-sm font-semibold ${
+                  expired ? 'border-red-700 bg-red-100 text-red-800' : 'border-amber-500 bg-amber-100 text-amber-800'
+                }`}
+              >
+                {expired
                   ? t('certExpiredAlert').replace('{category}', ins?.category || t('instrument')).replace('{id}', cert.id).replace('{date}', fmt(cert.expiryDate))
                   : t('certExpiringAlert').replace('{category}', ins?.category || t('instrument')).replace('{id}', cert.id).replace('{days}', info.days).replace('{s}', info.days === 1 ? '' : 's').replace('{date}', fmt(cert.expiryDate))}
               </div>
@@ -53,28 +59,28 @@ export default function OwnerDashboard() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <Stat label={t('statInstruments')} value={myInstruments.length} color="#0ea5e9" />
-        <Stat label={t('statApplications')} value={myApps.length} color="#6366f1" />
-        <Stat label={t('statCertified')} value={countByStatus('CERTIFIED')} color="#22c55e" />
-        <Stat label={t('statCertificates')} value={myCerts.length} color="#f59e0b" />
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Stat label={t('statInstruments')} value={myInstruments.length} className="text-blue-800" />
+        <Stat label={t('statApplications')} value={myApps.length} className="text-blue-800" />
+        <Stat label={t('statCertified')} value={countByStatus('CERTIFIED')} className="text-green-700" />
+        <Stat label={t('statCertificates')} value={myCerts.length} className="text-amber-800" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <h3 style={{ margin: 0, fontSize: 16, color: '#0f172a' }}>{t('recentApplications')}</h3>
-            <Link to="/applications" style={{ color: '#0ea5e9', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t('viewAll')}</Link>
+          <div className="mb-3.5 flex items-center justify-between">
+            <h3 className="m-0 text-base font-bold text-gray-800">{t('recentApplications')}</h3>
+            <Link to="/applications" className="text-sm font-semibold text-blue-800 hover:text-blue-900">{t('viewAll')}</Link>
           </div>
           {myApps.length === 0 && <Empty text={t('noApplicationsYet')} />}
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-2.5">
             {myApps.slice(0, 4).map(app => {
               const ins = appInstruments.find(i => i.id === app.instrumentId);
               return (
-                <div key={app.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>
+                <div key={app.id} className="flex items-center justify-between border-b border-gray-100 pb-2.5">
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{app.id}</div>
-                    <div style={{ fontSize: 12, color: '#64748b' }}>{ins?.category} · {fmt(app.submissionDate)}</div>
+                    <div className="text-sm font-bold text-gray-800">{app.id}</div>
+                    <div className="text-xs text-gray-600">{ins?.category} · {fmt(app.submissionDate)}</div>
                   </div>
                   <StatusBadge status={app.status} />
                 </div>
@@ -84,21 +90,21 @@ export default function OwnerDashboard() {
         </Card>
 
         <Card>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <h3 style={{ margin: 0, fontSize: 16, color: '#0f172a' }}>{t('certificatesIssued')}</h3>
-            <Link to="/certificates" style={{ color: '#0ea5e9', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t('viewAll')}</Link>
+          <div className="mb-3.5 flex items-center justify-between">
+            <h3 className="m-0 text-base font-bold text-gray-800">{t('certificatesIssued')}</h3>
+            <Link to="/certificates" className="text-sm font-semibold text-blue-800 hover:text-blue-900">{t('viewAll')}</Link>
           </div>
           {myCerts.length === 0 && <Empty text={t('noCertificatesYet')} />}
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-2.5">
             {myCerts.slice(0, 3).map(cert => {
               const info = expiryInfo(cert.expiryDate);
               return (
-                <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>
+                <div key={cert.id} className="flex items-center justify-between border-b border-gray-100 pb-2.5">
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{cert.id}</div>
-                    <div style={{ fontSize: 12, color: '#64748b' }}>{cert.category} · {cert.serialNumber}</div>
+                    <div className="text-sm font-bold text-gray-800">{cert.id}</div>
+                    <div className="text-xs text-gray-600">{cert.category} · {cert.serialNumber}</div>
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: info.color }}>{info.label}</span>
+                  <span className={`text-xs font-bold ${validityClass(info)}`}>{info.label}</span>
                 </div>
               );
             })}
@@ -107,53 +113,43 @@ export default function OwnerDashboard() {
       </div>
 
       {latestCert && (
-        <Card style={{ marginTop: 16 }}>
-          <h3 style={{ margin: '0 0 6px', fontSize: 16, color: '#0f172a' }}>{t('latestCertificate')}</h3>
+        <Card className="mt-4">
+          <h3 className="m-0 mb-1.5 text-base font-bold text-gray-800">{t('latestCertificate')}</h3>
           {latestCert ? (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-              <div style={{ color: '#64748b', fontSize: 14 }}>
-                <b style={{ color: '#0f172a' }}>{latestCert.category}</b> · {t('validUntil').replace('{date}', fmt(latestCert.expiryDate))}
+            <div className="mt-2 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+              <div className="text-sm text-gray-600">
+                <b className="text-gray-800">{latestCert.category}</b> · {t('validUntil').replace('{date}', fmt(latestCert.expiryDate))}
               </div>
-              <Link to={`/certificates/${latestCert.applicationId}`} style={linkBtn}>{t('viewCertificate')}</Link>
+              <Link to={`/certificates/${latestCert.applicationId}`} className="rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900">{t('viewCertificate')}</Link>
             </div>
           ) : null}
         </Card>
       )}
 
-      <Card style={{ marginTop: 16, borderLeft: '4px solid #ef4444' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+      <Card className="mt-4 border-l-4 border-l-red-700">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Flag size={18} color="#ef4444" /> {t('reportProblem')}
+            <div className="flex items-center gap-2 text-base font-bold text-gray-800">
+              <Flag size={18} className="text-red-700" /> {t('reportProblem')}
             </div>
-            <div style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>{t('reportProblemPromo')}</div>
+            <div className="mt-1 text-sm text-gray-600">{t('reportProblemPromo')}</div>
           </div>
-          <Link to="/report" style={complaintBtn}>{t('reportProblemShort')}</Link>
+          <Link to="/report" className="rounded-md bg-red-700 px-4 py-2.5 text-sm font-semibold whitespace-nowrap text-white hover:bg-red-800">{t('reportProblemShort')}</Link>
         </div>
       </Card>
     </div>
   );
 }
 
-function Stat({ label, value, color }) {
+function Stat({ label, value, className }) {
   return (
-    <Card style={{ padding: 18 }}>
-      <div style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>{label}</div>
-      <div style={{ fontSize: 30, fontWeight: 800, color, marginTop: 4 }}>{value}</div>
+    <Card className="px-4 py-4 lg:px-5">
+      <div className="text-sm font-medium text-gray-600">{label}</div>
+      <div className={`mt-1 text-3xl font-bold ${className}`}>{value}</div>
     </Card>
   );
 }
 
 function Empty({ text }) {
-  return <div style={{ color: '#94a3b8', fontSize: 13, padding: '20px 0', textAlign: 'center' }}>{text}</div>;
+  return <div className="py-5 text-center text-sm text-gray-500">{text}</div>;
 }
-
-const linkBtn = {
-  background: '#4f46e5', color: '#fff', padding: '8px 16px', borderRadius: 8,
-  fontSize: 13, fontWeight: 600, textDecoration: 'none',
-};
-
-const complaintBtn = {
-  background: '#ef4444', color: '#fff', padding: '10px 18px', borderRadius: 8,
-  fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap',
-};

@@ -24,35 +24,35 @@ export default function OfficerDashboard() {
     <div>
       <PageHeader title={t('welcomeOfficer').replace('{name}', currentUser.name)} subtitle={`${currentUser.department}`} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 16, marginBottom: 24 }}>
-        <Stat label={t('statSubmitted')} value={submitted.length} color="#6366f1" />
-        <Stat label={t('statScheduled')} value={scheduled.length} color="#f59e0b" />
-        <Stat label={t('statInspected')} value={inspired.length} color="#0ea5e9" />
-        <Stat label={t('statCertifiedAdmin')} value={certified.length} color="#22c55e" />
-        <Stat label={t('statRejected')} value={rejected.length} color="#ef4444" />
-        <Stat label={t('pendingComplaints')} value={activeComplaints.length} color="#9333ea" />
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
+        <Stat label={t('statSubmitted')} value={submitted.length} className="text-blue-800" />
+        <Stat label={t('statScheduled')} value={scheduled.length} className="text-amber-800" />
+        <Stat label={t('statInspected')} value={inspired.length} className="text-blue-800" />
+        <Stat label={t('statCertifiedAdmin')} value={certified.length} className="text-green-700" />
+        <Stat label={t('statRejected')} value={rejected.length} className="text-red-700" />
+        <Stat label={t('pendingComplaints')} value={activeComplaints.length} className="text-amber-800" />
       </div>
 
-      <Card style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-          <h3 style={{ margin: 0, fontSize: 16, color: '#0f172a' }}>{t('pendingReviewScheduling')}</h3>
-          <Link to="/officer/applications" style={{ color: '#0ea5e9', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t('allApplications')}</Link>
+      <Card className="mb-4">
+        <div className="mb-3.5 flex items-center justify-between">
+          <h3 className="m-0 text-base font-bold text-gray-800">{t('pendingReviewScheduling')}</h3>
+          <Link to="/officer/applications" className="text-sm font-semibold text-blue-800 hover:text-blue-900">{t('allApplications')}</Link>
         </div>
         {pendingInspection.length === 0 ? (
-          <p style={{ color: '#94a3b8', fontSize: 13 }}>{t('noPendingApplications')}</p>
+          <p className="text-sm text-gray-500">{t('noPendingApplications')}</p>
         ) : (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-2.5">
             {pendingInspection.map(app => {
               const ins = appInstruments.find(i => i.id === app.instrumentId);
               return (
-                <div key={app.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>
+                <div key={app.id} className="flex items-center justify-between border-b border-gray-100 pb-2.5">
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{app.id}</div>
-                    <div style={{ fontSize: 12, color: '#64748b' }}>{ins?.category} · {ins?.serialNumber} · {t('statSubmitted')} {fmt(app.submissionDate)}</div>
+                    <div className="text-sm font-bold text-gray-800">{app.id}</div>
+                    <div className="text-xs text-gray-600">{ins?.category} · {ins?.serialNumber} · {t('statSubmitted')} {fmt(app.submissionDate)}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <div className="flex items-center gap-2.5">
                     <StatusBadge status={app.status} />
-                    <Link to={`/officer/applications/${app.id}`} style={reviewBtn}>{t('review')}</Link>
+                    <Link to={`/officer/applications/${app.id}`} className="rounded-md bg-blue-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-900">{t('review')}</Link>
                   </div>
                 </div>
               );
@@ -62,19 +62,19 @@ export default function OfficerDashboard() {
       </Card>
 
       <Card>
-        <h3 style={{ margin: '0 0 14px', fontSize: 16, color: '#0f172a' }}>{t('recentlyCertified')}</h3>        {certified.length === 0 ? (
-          <p style={{ color: '#94a3b8', fontSize: 13 }}>{t('noCertifiedYet')}</p>
+        <h3 className="m-0 mb-3.5 text-base font-bold text-gray-800">{t('recentlyCertified')}</h3>        {certified.length === 0 ? (
+          <p className="text-sm text-gray-500">{t('noCertifiedYet')}</p>
         ) : (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-2.5">
             {certified.slice(0, 4).map(app => {
               const ins = appInstruments.find(i => i.id === app.instrumentId);
               return (
-                <div key={app.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>
+                <div key={app.id} className="flex items-center justify-between border-b border-gray-100 pb-2.5">
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>{app.id}</div>
-                    <div style={{ fontSize: 12, color: '#64748b' }}>{ins?.category} · {t('statInspected')} {fmt(app.inspectionDate)}</div>
+                    <div className="text-sm font-bold text-gray-800">{app.id}</div>
+                    <div className="text-xs text-gray-600">{ins?.category} · {t('statInspected')} {fmt(app.inspectionDate)}</div>
                   </div>
-                  <Link to={`/officer/applications/${app.id}`} style={{ color: '#0ea5e9', fontWeight: 600, fontSize: 13, textDecoration: 'none' }}>{t('viewLink')}</Link>
+                  <Link to={`/officer/applications/${app.id}`} className="text-sm font-medium text-blue-800 hover:text-blue-900">{t('viewLink')}</Link>
                 </div>
               );
             })}
@@ -82,28 +82,28 @@ export default function OfficerDashboard() {
         )}
       </Card>
 
-      <Card style={{ marginTop: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-          <h3 style={{ margin: 0, fontSize: 16, color: '#0f172a' }}>{t('publicComplaints')}</h3>
-          <Link to="/officer/complaints" style={{ color: '#0ea5e9', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>{t('viewAll')}</Link>
+      <Card className="mt-4">
+        <div className="mb-3.5 flex items-center justify-between">
+          <h3 className="m-0 text-base font-bold text-gray-800">{t('publicComplaints')}</h3>
+          <Link to="/officer/complaints" className="text-sm font-semibold text-blue-800 hover:text-blue-900">{t('viewAll')}</Link>
         </div>
         {recentComplaints.length === 0 ? (
-          <p style={{ color: '#94a3b8', fontSize: 13 }}>{t('noComplaintsMsg')}</p>
+          <p className="text-sm text-gray-500">{t('noComplaintsMsg')}</p>
         ) : (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-2.5">
             {recentComplaints.map(c => {
               const ins = appInstruments.find(i => i.id === c.instrumentId);
               return (
-                <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: 10 }}>
+                <div key={c.id} className="flex items-center justify-between border-b border-gray-100 pb-2.5">
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>
-                      {c.id} <span style={{ color: '#0ea5e9', fontWeight: 600 }}>· {c.certificateId}</span>
+                    <div className="text-sm font-bold text-gray-800">
+                      {c.id} <span className="font-medium text-blue-800">· {c.certificateId}</span>
                     </div>
-                    <div style={{ fontSize: 12, color: '#64748b' }}>{c.complaintType} · {ins?.location || t('location')} · {c.filedAt || fmt(c.submittedAt)} {c.filedTime ? `, ${c.filedTime}` : ''}</div>
+                    <div className="text-xs text-gray-600">{c.complaintType} · {ins?.location || t('location')} · {c.filedAt || fmt(c.submittedAt)} {c.filedTime ? `, ${c.filedTime}` : ''}</div>
                   </div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <div className="flex items-center gap-2.5">
                     <ComplaintStatusBadge status={c.status} />
-                    <Link to={`/officer/complaints/${c.id}`} style={reviewBtn}>{t('viewLink')}</Link>
+                    <Link to={`/officer/complaints/${c.id}`} className="rounded-md bg-blue-800 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-900">{t('viewLink')}</Link>
                   </div>
                 </div>
               );
@@ -115,16 +115,11 @@ export default function OfficerDashboard() {
   );
 }
 
-function Stat({ label, value, color }) {
+function Stat({ label, value, className }) {
   return (
-    <Card style={{ padding: 16 }}>
-      <div style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 800, color, marginTop: 4 }}>{value}</div>
+    <Card className="px-4 py-4">
+      <div className="text-xs font-medium text-gray-600">{label}</div>
+      <div className={`mt-1 text-2xl font-bold ${className}`}>{value}</div>
     </Card>
   );
 }
-
-const reviewBtn = {
-  background: '#4f46e5', color: '#fff', padding: '8px 14px', borderRadius: 8,
-  fontSize: 12, fontWeight: 700, textDecoration: 'none',
-};

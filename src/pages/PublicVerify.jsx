@@ -55,34 +55,38 @@ export default function PublicVerify() {
   const cert = result?.cert;
 
   return (
-    <div style={{ minHeight: '100vh', padding: 40, background: 'linear-gradient(135deg,#0f172a,#1e293b)' }}>
-      <div style={{ maxWidth: 800, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, color: '#fff' }}>
-            <Scale size={32} color="#38bdf8" />
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: 22, fontWeight: 800 }}>{t('certificateVerification')}</div>
-              <div style={{ fontSize: 13, color: '#94a3b8' }}>{t('legalMetrologyDepartment')}</div>
+    <div style={{ minHeight: '100vh' }} className="bg-gray-100 p-4 sm:p-8 lg:p-12">
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-7 text-center">
+          <div className="inline-flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-900 text-amber-400">
+              <Scale size={30} />
+            </div>
+            <div className="text-left">
+              <div className="text-lg font-bold text-blue-900 sm:text-xl">{t('certificateVerification')}</div>
+              <div className="text-xs text-gray-600 sm:text-sm">{t('legalMetrologyDepartment')}</div>
             </div>
           </div>
         </div>
 
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24 }}>
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10 }}>
+        <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+          <form onSubmit={handleSearch} className="flex flex-col gap-3 sm:flex-row sm:gap-2.5">
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder={t('enterCertPlaceholder')}
-              style={{ flex: 1, padding: '14px 16px', border: '2px solid #cbd5e1', borderRadius: 10, fontSize: 15 }}
+              className="flex-1 rounded-md border border-gray-300 px-4 py-3 text-sm text-gray-800 focus:border-blue-700 focus:outline-none"
             />
-            <button style={searchBtn}>{t('verify')}</button>
+            <button className="cursor-pointer rounded-md bg-blue-800 px-8 py-3 text-sm font-semibold text-white hover:bg-blue-900">
+              {t('verify')}
+            </button>
           </form>
-          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 10 }}>
+          <div className="mt-2.5 text-xs text-gray-500">
             {t('tryHint').replace('{a}', 'CERT-2026-001').replace('{b}', 'CERT-2025-003')}
           </div>
 
           {searched && !cert && result?.notFound && (
-            <Alert type="error">{t('certNotVerified')}</Alert>
+            <div className="mt-4"><Alert type="error">{t('certNotVerified')}</Alert></div>
           )}
           {cert && <CertificateResult cert={cert} />}
         </div>
@@ -93,12 +97,12 @@ export default function PublicVerify() {
 
 // Compute the certificate status from the issued snapshot.
 function certStatus(cert, t) {
-  if (cert.status === 'REVOKED') return { label: t('statusRevoked'), color: '#ef4444', icon: <Ban size={26} />, sub: t('statusRevokedSub') };
-  if (cert.result === 'REJECTED' || cert.status === 'REJECTED') return { label: t('statusRejected'), color: '#ef4444', icon: <BadgeX size={26} />, sub: t('statusRejectedSub') };
+  if (cert.status === 'REVOKED') return { label: t('statusRevoked'), text: 'text-red-800', band: 'bg-red-700', ring: 'border-red-700', icon: <Ban size={26} />, sub: t('statusRevokedSub') };
+  if (cert.result === 'REJECTED' || cert.status === 'REJECTED') return { label: t('statusRejected'), text: 'text-red-800', band: 'bg-red-700', ring: 'border-red-700', icon: <BadgeX size={26} />, sub: t('statusRejectedSub') };
   const info = expiryInfo(cert.expiryDate);
-  if (info.status === 'expired') return { label: t('statusExpired'), color: '#ef4444', icon: <ShieldAlert size={26} />, sub: t('certExpiredSub') };
-  if (info.status === 'expiring') return { label: t('statusExpiringSoon'), color: '#f59e0b', icon: <ShieldAlert size={26} />, sub: t('certExpiringSub').replace('{days}', info.days) };
-  return { label: t('statusValid'), color: '#22c55e', icon: <ShieldCheck size={26} />, sub: t('certValidSub') };
+  if (info.status === 'expired') return { label: t('statusExpired'), text: 'text-red-800', band: 'bg-red-700', ring: 'border-red-700', icon: <ShieldAlert size={26} />, sub: t('certExpiredSub') };
+  if (info.status === 'expiring') return { label: t('statusExpiringSoon'), text: 'text-amber-800', band: 'bg-amber-600', ring: 'border-amber-500', icon: <ShieldAlert size={26} />, sub: t('certExpiringSub').replace('{days}', info.days) };
+  return { label: t('statusValid'), text: 'text-green-800', band: 'bg-green-700', ring: 'border-green-700', icon: <ShieldCheck size={26} />, sub: t('certValidSub') };
 }
 
 function CertificateResult({ cert }) {
@@ -110,23 +114,23 @@ function CertificateResult({ cert }) {
   const revoked = status.label === t('statusRevoked');
 
   return (
-    <div style={{ marginTop: 24 }}>
-      <div style={{ border: `2px solid ${status.color}`, borderRadius: 12, overflow: 'hidden' }}>
-        <div style={{ background: status.color, color: '#fff', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div className="mt-6">
+      <div className={`overflow-hidden rounded-lg border-2 ${status.ring}`}>
+        <div className={`flex items-center gap-2.5 ${status.band} px-5 py-4 text-white`}>
           {status.icon}
           <div>
-            <div style={{ fontSize: 20, fontWeight: 800 }}>{status.label}</div>
-            <div style={{ fontSize: 13, opacity: 0.9 }}>{status.sub}</div>
+            <div className="text-lg font-bold">{status.label}</div>
+            <div className="text-xs opacity-90">{status.sub}</div>
           </div>
         </div>
 
-        <div style={{ padding: 20, background: '#fff' }}>
+        <div className="bg-white p-5">
           {revoked && <Alert type="error">{t('certificateRevoked')}</Alert>}
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
-            {t('certificateNumber')} <b style={{ color: '#0f172a', fontSize: 14 }}>{cert.id}</b>
+          <div className="mb-2.5 text-xs font-bold uppercase tracking-wide text-gray-600">
+            {t('certificateNumber')} <b className="text-sm text-gray-800">{cert.id}</b>
           </div>
           <DetailRow>
-            <Field label={t('certificateStatus')} value={status.label} color={status.color} />
+            <Field label={t('certificateStatus')} value={status.label} className={status.text} />
             <Field label={t('applicationIdField')} value={cert.applicationId} />
             <Field label={t('ownerName')} value={cert.ownerName} />
             <Field label={t('machineTypeField')} value={cert.machineType} />
@@ -138,21 +142,21 @@ function CertificateResult({ cert }) {
             <Field label={t('location')} value={cert.location} />
             <Field label={t('verificationDate')} value={fmt(cert.verificationDate)} />
             <Field label={t('issueDate')} value={fmt(cert.issueDate)} />
-            <Field label={t('expiryDate')} value={fmt(cert.expiryDate)} color={isExpired ? status.color : undefined} />
-            <Field label={t('verificationResultField')} value={cert.result === 'CERTIFIED' ? t('verifiedCertified') : t('rejectedStatus')} color={cert.result === 'CERTIFIED' ? '#22c55e' : '#ef4444'} />
+            <Field label={t('expiryDate')} value={fmt(cert.expiryDate)} className={isExpired ? status.text : ''} />
+            <Field label={t('verificationResultField')} value={cert.result === 'CERTIFIED' ? t('verifiedCertified') : t('rejectedStatus')} className={cert.result === 'CERTIFIED' ? 'text-green-800' : 'text-red-800'} />
             <Field label={t('officerTester')} value={cert.officerName || officer?.name} />
           </DetailRow>
 
           {/* Public complaint entry point — opens the complaint form with THIS
               exact certificate already attached (via ?cert= number), so the
               public user never re-enters or edits the certificate details. */}
-          <div style={{ marginTop: 20, textAlign: 'center' }}>
-            <Link to={`/report?cert=${cert.id}`} style={reportBtn}>
+          <div className="mt-5 text-center">
+            <Link to={`/report?cert=${cert.id}`} className="inline-block rounded-md bg-red-700 px-6 py-3 text-sm font-semibold text-white hover:bg-red-800">
               🚨 {t('reportProblem')}
             </Link>
           </div>
 
-          <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px dashed #cbd5e1', textAlign: 'center', fontSize: 13, color: '#64748b' }}>
+          <div className="mt-3.5 border-t border-dashed border-gray-300 pt-3.5 text-center text-sm text-gray-600">
             {t('verifiedFromSystem')}
           </div>
         </div>
@@ -160,13 +164,3 @@ function CertificateResult({ cert }) {
     </div>
   );
 }
-
-const searchBtn = {
-  background: '#4f46e5', color: '#fff', padding: '0 28px', borderRadius: 10,
-  fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer',
-};
-
-const reportBtn = {
-  display: 'inline-block', background: '#ef4444', color: '#fff', padding: '12px 24px',
-  borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: 'none',
-};

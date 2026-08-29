@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSelector from './LanguageSelector';
@@ -21,23 +21,22 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <aside style={{ width: 260, background: '#0f172a', color: '#e2e8f0', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, bottom: 0, left: 0 }}>
-        <div style={{ padding: '20px 16px', borderBottom: '1px solid #1e293b' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Scale size={28} style={{ color: '#38bdf8' }} />
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 16, color: '#fff' }}>{t('portalName')}</div>
-                <div style={{ fontSize: 11, color: '#94a3b8' }}>{t('portalSubtitle')}</div>
-              </div>
+    <div className="min-h-screen lg:flex">
+      <aside className="bg-blue-900 text-gray-100 lg:fixed lg:inset-y-0 lg:left-0 lg:z-20 lg:flex lg:w-64 lg:flex-col">
+        <div className="flex items-center justify-between border-b border-blue-800 px-4 py-4 lg:px-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-800 text-amber-400">
+              <Scale size={26} />
             </div>
-            {/* Language selector — visible only here (after login) */}
-            <LanguageSelector />
+            <div>
+              <div className="text-sm font-bold text-white">{t('portalName')}</div>
+              <div className="text-xs text-blue-200">{t('portalSubtitle')}</div>
+            </div>
           </div>
+          <LanguageSelector />
         </div>
 
-        <nav style={{ flex: 1, padding: '16px 0', overflowY: 'auto' }}>
+        <nav className="flex flex-1 gap-1 overflow-x-auto px-2 py-3 lg:flex-col lg:gap-0 lg:overflow-y-auto lg:px-0 lg:py-4">
           <MenuLink to="/dashboard" icon={<LayoutDashboard size={18} />} label={t('dashboard')} />
           {currentUser?.role === 'owner' && (
             <>
@@ -67,53 +66,36 @@ export default function Layout({ children }) {
           <MenuLink to="/verify" icon={<ShieldCheck size={18} />} label={t('publicVerify')} />
         </nav>
 
-        <div style={{ padding: '16px', borderTop: '1px solid #1e293b' }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{currentUser?.name}</div>
-          <div style={{ fontSize: 11, color: '#94a3b8', marginBottom: 10 }}>{t(roleLabelKeys[currentUser?.role])}</div>
-          <button onClick={handleLogout} style={logoutStyle}>
+        <div className="border-t border-blue-800 px-4 py-3 lg:px-5">
+          <div className="text-sm font-semibold text-white">{currentUser?.name}</div>
+          <div className="mb-2 text-xs text-blue-200">{t(roleLabelKeys[currentUser?.role])}</div>
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-2 rounded-md border border-blue-700 bg-blue-800 px-3 py-2 text-sm font-semibold text-red-200 hover:bg-blue-700 hover:text-red-100"
+          >
             <LogOut size={16} /> {t('logout')}
           </button>
         </div>
       </aside>
 
-      <main style={{ flex: 1, marginLeft: 260, padding: '28px 36px', background: '#f1f5f9' }}>
+      <main className="min-h-screen flex-1 bg-gray-100 p-4 sm:p-6 lg:ml-64 lg:p-8">
         {children}
       </main>
     </div>
   );
 }
 
-const logoutStyle = {
-  width: '100%',
-  padding: '8px 12px',
-  background: '#1e293b',
-  color: '#f87171',
-  border: 'none',
-  borderRadius: 6,
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-  fontSize: 13,
-  fontWeight: 600,
-};
-
 function MenuLink({ to, icon, label }) {
   return (
     <NavLink
       to={to}
-      style={({ isActive }) => ({
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '10px 20px',
-        textDecoration: 'none',
-        color: isActive ? '#38bdf8' : '#94a3b8',
-        fontWeight: isActive ? 600 : 400,
-        borderLeft: isActive ? '3px solid #38bdf8' : '3px solid transparent',
-        background: isActive ? 'rgba(56,189,248,0.08)' : 'transparent',
-        fontSize: 14,
-      })}
+      className={({ isActive }) =>
+        `flex shrink-0 items-center gap-3 rounded-md px-4 py-2.5 text-sm whitespace-nowrap lg:whitespace-normal lg:rounded-none lg:border-l-4 lg:px-5 lg:py-2.5 ${
+          isActive
+            ? 'border-amber-400 bg-blue-800 font-semibold text-white'
+            : 'border-transparent text-blue-100 hover:bg-blue-800 hover:text-white'
+        }`
+      }
     >
       {icon} {label}
     </NavLink>

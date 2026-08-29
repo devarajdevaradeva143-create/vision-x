@@ -12,6 +12,12 @@ export default function OwnerCertificates() {
     .filter(c => c.ownerId === currentUser.id)
     .sort((a, b) => new Date(b.issueDate) - new Date(a.issueDate));
 
+  const validityClass = (info) => {
+    if (info.status === 'expired') return 'text-red-800';
+    if (info.status === 'expiring') return 'text-amber-800';
+    return 'text-green-800';
+  };
+
   return (
     <div>
       <PageHeader title={t('myCertificates')} subtitle={t('viewDownloadCerts')} />
@@ -24,17 +30,17 @@ export default function OwnerCertificates() {
               const info = expiryInfo(cert.expiryDate);
               const ins = appInstruments.find(i => i.id === cert.instrumentId);
               return (
-                <tr key={cert.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0ea5e9' }}>{cert.id}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{cert.category}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{cert.serialNumber}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{fmt(cert.issueDate)}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{fmt(cert.expiryDate)}</td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <span style={{ fontWeight: 700, color: info.color, fontSize: 13 }}>{info.label}</span>
+                <tr key={cert.id} className="border-b border-gray-100">
+                  <td className="px-4 py-3 text-sm font-bold text-blue-800">{cert.id}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{cert.category}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{cert.serialNumber}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{fmt(cert.issueDate)}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{fmt(cert.expiryDate)}</td>
+                  <td className="px-4 py-3">
+                    <span className={`text-sm font-bold ${validityClass(info)}`}>{info.label}</span>
                   </td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <Link to={`/certificates/${cert.applicationId}`} style={viewBtn}>{t('viewCertificate')}</Link>
+                  <td className="px-4 py-3">
+                    <Link to={`/certificates/${cert.applicationId}`} className="text-sm font-medium text-blue-800 hover:text-blue-900">{t('viewCertificate')}</Link>
                   </td>
                 </tr>
               );
@@ -45,7 +51,3 @@ export default function OwnerCertificates() {
     </div>
   );
 }
-
-const viewBtn = {
-  color: '#0ea5e9', fontWeight: 600, fontSize: 13, textDecoration: 'none',
-};

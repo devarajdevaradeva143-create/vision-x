@@ -21,41 +21,41 @@ export default function AdminDashboard() {
     <div>
       <PageHeader title={t('systemOverview')} subtitle={t('systemOverviewSub')} />
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <Stat label={t('owners')} value={owners.length} color="#0ea5e9" />
-        <Stat label={t('officers')} value={officers.length} color="#6366f1" />
-        <Stat label={t('statInstruments')} value={appInstruments.length} color="#8b5cf6" />
-        <Stat label={t('statApplications')} value={appApplications.length} color="#f59e0b" />
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Stat label={t('owners')} value={owners.length} className="text-blue-800" />
+        <Stat label={t('officers')} value={officers.length} className="text-green-700" />
+        <Stat label={t('statInstruments')} value={appInstruments.length} className="text-blue-800" />
+        <Stat label={t('statApplications')} value={appApplications.length} className="text-amber-800" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+      <div className="grid gap-4 lg:grid-cols-3">
         <Card>
-          <h3 style={{ margin: '0 0 14px', fontSize: 16, color: '#0f172a' }}>{t('applicationsByStatus')}</h3>
-          <div style={{ display: 'grid', gap: 8 }}>
+          <h3 className="m-0 mb-3.5 text-base font-bold text-gray-800">{t('applicationsByStatus')}</h3>
+          <div className="grid gap-2">
             {['SUBMITTED', 'SCHEDULED', 'INSPECTED', 'CERTIFIED', 'REJECTED'].map(s => (
-              <div key={s} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-                <span style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>{statusLabel(t, s)}</span>
-                <span style={{ fontSize: 16, fontWeight: 800, color: statusColor(s) }}>{byStatus(s)}</span>
+              <div key={s} className="flex items-center justify-between border-b border-gray-100 pb-2">
+                <span className="text-sm font-medium text-gray-700">{statusLabel(t, s)}</span>
+                <span className={`text-base font-bold ${statusClass(s)}`}>{byStatus(s)}</span>
               </div>
             ))}
           </div>
         </Card>
 
         <Card>
-          <h3 style={{ margin: '0 0 14px', fontSize: 16, color: '#0f172a' }}>{t('certificateValidity')}</h3>
-          <div style={{ display: 'grid', gap: 8 }}>
-            <ValidityRow label={t('valid')} count={validCerts} color="#22c55e" />
-            <ValidityRow label={t('expiringSoon')} count={expiringCerts} color="#f59e0b" />
-            <ValidityRow label={t('expired')} count={expiredCerts} color="#ef4444" />
+          <h3 className="m-0 mb-3.5 text-base font-bold text-gray-800">{t('certificateValidity')}</h3>
+          <div className="grid gap-2">
+            <ValidityRow label={t('valid')} count={validCerts} className="text-green-700" />
+            <ValidityRow label={t('expiringSoon')} count={expiringCerts} className="text-amber-800" />
+            <ValidityRow label={t('expired')} count={expiredCerts} className="text-red-700" />
           </div>
         </Card>
 
         <Card>
-          <h3 style={{ margin: '0 0 14px', fontSize: 16, color: '#0f172a' }}>{t('summary')}</h3>
-          <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.8 }}>
+          <h3 className="m-0 mb-3.5 text-base font-bold text-gray-800">{t('summary')}</h3>
+          <div className="text-sm leading-relaxed text-gray-700">
             {t('summaryText').replace('{certs}', appCertificates.length).replace('{instruments}', appInstruments.length)}
           </div>
-          <div style={{ marginTop: 14, padding: 10, background: '#f8fafc', borderRadius: 8, fontSize: 12, color: '#64748b' }}>
+          <div className="mt-3.5 rounded-md bg-gray-50 px-3 py-2.5 text-xs text-gray-600">
             {t('expiringNote').replace('{count}', expiringCerts)}
           </div>
         </Card>
@@ -69,24 +69,24 @@ function statusLabel(t, s) {
   return key ? t(key) : s;
 }
 
-function Stat({ label, value, color }) {
+function Stat({ label, value, className }) {
   return (
-    <Card style={{ padding: 16 }}>
-      <div style={{ fontSize: 12, color: '#64748b', fontWeight: 600 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 800, color, marginTop: 4 }}>{value}</div>
+    <Card className="px-4 py-4 lg:px-5">
+      <div className="text-sm font-medium text-gray-600">{label}</div>
+      <div className={`mt-1 text-3xl font-bold ${className}`}>{value}</div>
     </Card>
   );
 }
 
-function ValidityRow({ label, count, color }) {
+function ValidityRow({ label, count, className }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
-      <span style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>{label}</span>
-      <span style={{ fontSize: 16, fontWeight: 800, color }}>{count}</span>
+    <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+      <span className="text-sm font-medium text-gray-700">{label}</span>
+      <span className={`text-base font-bold ${className}`}>{count}</span>
     </div>
   );
 }
 
-function statusColor(s) {
-  return { SUBMITTED: '#6366f1', SCHEDULED: '#f59e0b', INSPECTED: '#0ea5e9', CERTIFIED: '#22c55e', REJECTED: '#ef4444' }[s] || '#64748b';
+function statusClass(s) {
+  return { SUBMITTED: 'text-blue-800', SCHEDULED: 'text-amber-800', INSPECTED: 'text-blue-800', CERTIFIED: 'text-green-700', REJECTED: 'text-red-700' }[s] || 'text-gray-600';
 }

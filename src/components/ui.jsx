@@ -1,12 +1,12 @@
 import { useLanguage } from '../context/LanguageContext';
 
-const statusColors = {
-  PAYMENT_PENDING: '#f59e0b',
-  SUBMITTED: '#6366f1',
-  SCHEDULED: '#f59e0b',
-  INSPECTED: '#0ea5e9',
-  CERTIFIED: '#22c55e',
-  REJECTED: '#ef4444',
+const statusClasses = {
+  PAYMENT_PENDING: 'bg-amber-100 text-amber-800',
+  SUBMITTED: 'bg-blue-100 text-blue-800',
+  SCHEDULED: 'bg-amber-100 text-amber-800',
+  INSPECTED: 'bg-blue-100 text-blue-800',
+  CERTIFIED: 'bg-green-100 text-green-800',
+  REJECTED: 'bg-red-100 text-red-800',
 };
 
 const statusLabelKeys = {
@@ -20,12 +20,12 @@ const statusLabelKeys = {
 
 export function StatusBadge({ status }) {
   const { t } = useLanguage();
-  const color = statusColors[status] || '#64748b';
+  const classes = statusClasses[status] || 'bg-gray-100 text-gray-700';
   // Keep the underlying status code (it is the shared enum used everywhere) but
   // display it through the translation key for the selected language.
   const label = statusLabelKeys[status] ? t(statusLabelKeys[status]) : status;
   return (
-    <span style={{ background: `${color}22`, color, padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>
+    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ${classes}`}>
       {label}
     </span>
   );
@@ -34,21 +34,21 @@ export function StatusBadge({ status }) {
 // Complaint workflow statuses (independent of the application status enum used
 // by StatusBadge above, so the two never interfere):
 // PENDING -> ASSIGNED -> INSPECTION SCHEDULED -> INSPECTED -> ACTION TAKEN -> RESOLVED
-const complaintStatusColors = {
-  PENDING: '#ef4444',
-  ASSIGNED: '#f59e0b',
-  'INSPECTION SCHEDULED': '#0ea5e9',
-  INSPECTED: '#6366f1',
-  'ACTION TAKEN': '#9333ea',
-  RESOLVED: '#22c55e',
+const complaintStatusClasses = {
+  PENDING: 'bg-red-100 text-red-800',
+  ASSIGNED: 'bg-amber-100 text-amber-800',
+  'INSPECTION SCHEDULED': 'bg-blue-100 text-blue-800',
+  INSPECTED: 'bg-blue-100 text-blue-800',
+  'ACTION TAKEN': 'bg-green-100 text-green-800',
+  RESOLVED: 'bg-green-100 text-green-800',
 };
 
 export function ComplaintStatusBadge({ status }) {
   const { t } = useLanguage();
-  const color = complaintStatusColors[status] || '#64748b';
+  const classes = complaintStatusClasses[status] || 'bg-gray-100 text-gray-700';
   const label = t(`complaintStatus_${status.replace(/ /g, '_')}`) || status;
   return (
-    <span style={{ background: `${color}22`, color, padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700, letterSpacing: 0.5 }}>
+    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ${classes}`}>
       {label}
     </span>
   );
@@ -69,7 +69,7 @@ export function ProgressTracker({ status }) {
   // Before payment the application has not really started the workflow yet.
   if (status === 'PAYMENT_PENDING') {
     return (
-      <div style={{ padding: '14px 18px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, color: '#b45309', fontWeight: 600, fontSize: 13 }}>
+      <div className="rounded-md border border-amber-200 bg-amber-100 px-4 py-3 text-sm font-medium text-amber-800">
         ⏳ Payment Pending — complete the payment to submit this application for verification.
       </div>
     );
@@ -77,31 +77,26 @@ export function ProgressTracker({ status }) {
 
   if (isRejected) {
     return (
-      <div style={{ padding: '14px 18px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#b91c1c', fontWeight: 600, fontSize: 13 }}>
+      <div className="rounded-md border border-red-200 bg-red-100 px-4 py-3 text-sm font-medium text-red-800">
         ⚠ This application was REJECTED during inspection. Please review the remarks and re-apply.
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+    <div className="flex flex-wrap items-center">
       {steps.map((step, i) => {
         const done = i <= currentIndex;
-        const color = done ? '#22c55e' : '#cbd5e1';
         return (
-          <div key={step.key} style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{
-                width: 24, height: 24, borderRadius: '50%', background: done ? '#22c55e' : '#e2e8f0',
-                color: done ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, fontWeight: 700,
-              }}>
+          <div key={step.key} className="flex items-center">
+            <div className="flex items-center gap-2">
+              <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${done ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-500'}`}>
                 {done ? (done && i === currentIndex ? String(i + 1) : '✓') : String(i + 1)}
               </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color: done ? '#15803d' : '#94a3b8' }}>{t(step.labelKey)}</span>
+              <span className={`text-xs font-semibold ${done ? 'text-green-700' : 'text-gray-500'}`}>{t(step.labelKey)}</span>
             </div>
             {i < steps.length - 1 && (
-              <div style={{ width: 30, height: 2, background: i < currentIndex ? '#22c55e' : '#e2e8f0', margin: '0 8px' }} />
+              <div className={`mx-2 h-0.5 w-8 ${i < currentIndex ? 'bg-green-700' : 'bg-gray-200'}`} />
             )}
           </div>
         );
@@ -112,30 +107,37 @@ export function ProgressTracker({ status }) {
 
 export function Alert({ type = 'info', children }) {
   const colors = {
-    info: { bg: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8', icon: 'ℹ' },
-    success: { bg: '#f0fdf4', border: '#bbf7d0', color: '#15803d', icon: '✓' },
-    warning: { bg: '#fffbeb', border: '#fde68a', color: '#b45309', icon: '⚠' },
-    error: { bg: '#fef2f2', border: '#fecaca', color: '#b91c1c', icon: '✕' },
+    info: { box: 'bg-blue-100 border-blue-200 text-blue-800', icon: 'ℹ' },
+    success: { box: 'bg-green-100 border-green-200 text-green-800', icon: '✓' },
+    warning: { box: 'bg-amber-100 border-amber-200 text-amber-800', icon: '⚠' },
+    error: { box: 'bg-red-100 border-red-200 text-red-800', icon: '✕' },
   };
   const c = colors[type] || colors.info;
   return (
-    <div style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.color, padding: '10px 14px', borderRadius: 8, fontSize: 13, display: 'flex', gap: 8, alignItems: 'center' }}>
-      <span style={{ fontWeight: 700 }}>{c.icon}</span>
+    <div className={`flex items-center gap-2 rounded-md border px-3.5 py-2.5 text-sm ${c.box}`}>
+      <span className="font-bold">{c.icon}</span>
       <div>{children}</div>
     </div>
   );
 }
 
-export function Card({ children, style }) {
-  return <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: 20, ...style }}>{children}</div>;
+export function Card({ children, style, className = '' }) {
+  return (
+    <div
+      className={`rounded-lg border border-gray-200 bg-white p-5 shadow-sm ${className}`}
+      style={style}
+    >
+      {children}
+    </div>
+  );
 }
 
 export function PageHeader({ title, subtitle, action }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>{title}</h1>
-        {subtitle && <p style={{ color: '#64748b', fontSize: 14, margin: '4px 0 0' }}>{subtitle}</p>}
+        <h1 className="m-0 text-xl font-bold text-gray-800 sm:text-2xl">{title}</h1>
+        {subtitle && <p className="mt-1 text-sm text-gray-600">{subtitle}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>
@@ -144,33 +146,35 @@ export function PageHeader({ title, subtitle, action }) {
 
 export function EmptyState({ message }) {
   return (
-    <Card style={{ textAlign: 'center', color: '#94a3b8', padding: 40 }}>
-      <div style={{ fontSize: 40, marginBottom: 8 }}>🗂</div>
-      <div style={{ fontSize: 14 }}>{message}</div>
+    <Card className="py-10 text-center text-gray-500">
+      <div className="mb-2 text-4xl">🗂</div>
+      <div className="text-sm">{message}</div>
     </Card>
   );
 }
 
-export function Field({ label, value, color }) {
+export function Field({ label, value, color, className = '' }) {
   return (
     <div>
-      <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</div>
-      <div style={{ fontSize: 14, color: color || '#0f172a', fontWeight: 500, marginTop: 2 }}>{value || <span style={{ color: '#cbd5e1' }}>—</span>}</div>
+      <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</div>
+      <div className={`mt-0.5 text-sm font-medium ${color ? '' : 'text-gray-800'} ${className}`} style={color ? { color } : undefined}>{value || <span className="text-gray-300">—</span>}</div>
     </div>
   );
 }
 
 export function DetailRow({ children }) {
-  return <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>{children}</div>;
+  return <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">{children}</div>;
 }
 
 export function Table({ headers, children }) {
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
         <thead>
-          <tr style={{ background: '#f8fafc', color: '#475569', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-            {headers.map(h => <th key={h} style={{ textAlign: 'left', padding: '10px 14px', borderBottom: '1px solid #e2e8f0' }}>{h}</th>)}
+          <tr className="bg-gray-50 text-gray-600">
+            {headers.map(h => (
+              <th key={h} className="whitespace-nowrap border-b border-gray-200 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">{h}</th>
+            ))}
           </tr>
         </thead>
         <tbody>{children}</tbody>

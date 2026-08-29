@@ -34,70 +34,78 @@ export default function AdminUsers() {
     setMsg({ type: 'success', text: t('roleChangedMsg').replace('{name}', user.name).replace('{role}', role) });
   };
 
-  const input = { width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 14 };
-  const Label = ({ children }) => <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4, marginTop: 10 }}>{children}</div>;
+  const input = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-700 focus:outline-none';
+  const Label = ({ children }) => <div className="mb-1 mt-2.5 text-sm font-medium text-gray-700">{children}</div>;
 
   return (
     <div>
       <PageHeader
         title={t('manageUsers')}
         subtitle={t('manageUsersSub')}
-        action={<button onClick={() => setShowAdd(!showAdd)} style={addBtn}>{showAdd ? t('cancel') : t('addUser')}</button>}
+        action={<button onClick={() => setShowAdd(!showAdd)} className="cursor-pointer rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">{showAdd ? t('cancel') : t('addUser')}</button>}
       />
 
-      {msg && <div style={{ marginBottom: 16 }}><Alert type={msg.type}>{msg.text}</Alert></div>}
+      {msg && <div className="mb-4"><Alert type={msg.type}>{msg.text}</Alert></div>}
 
       {showAdd && (
-        <Card style={{ marginBottom: 20 }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: 16, color: '#0f172a' }}>{t('addNewUser')}</h3>
+        <Card className="mb-5">
+          <h3 className="m-0 mb-3 text-base font-bold text-gray-800">{t('addNewUser')}</h3>
           <form onSubmit={handleAdd}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
-              <div><Label>{t('fullName')}</Label><input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={input} required /></div>
-              <div><Label>{t('email')}</Label><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} style={input} required /></div>
-              <div><Label>{t('password')}</Label><input value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} style={input} required /></div>
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+              <div><Label>{t('fullName')}</Label><input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className={input} required /></div>
+              <div><Label>{t('email')}</Label><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={input} required /></div>
+              <div><Label>{t('password')}</Label><input value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className={input} required /></div>
               <div><Label>{t('role')}</Label>
-                <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} style={input}>
+                <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} className={input}>
                   <option value="owner">{t('owner')}</option>
                   <option value="officer">{t('officer')}</option>
                   <option value="admin">{t('admin')}</option>
                 </select>
               </div>
-              <div><Label>{t('phoneField')}</Label><input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={input} /></div>
+              <div><Label>{t('phoneField')}</Label><input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={input} /></div>
               <div><Label>{form.role === 'owner' ? t('address') : t('department')}</Label>
-                <input value={form.role === 'owner' ? form.address : form.department} onChange={e => setForm({ ...form, [form.role === 'owner' ? 'address' : 'department']: e.target.value })} style={input} />
+                <input value={form.role === 'owner' ? form.address : form.department} onChange={e => setForm({ ...form, [form.role === 'owner' ? 'address' : 'department']: e.target.value })} className={input} />
               </div>
             </div>
-            <button style={{ ...addBtn, marginTop: 16 }}>{t('createUser')}</button>
+            <button className="mt-4 cursor-pointer rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">{t('createUser')}</button>
           </form>
         </Card>
       )}
 
       <Card>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <div className="mb-4 flex flex-wrap gap-2">
           {['ALL', 'owner', 'officer', 'admin'].map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 14px', borderRadius: 999, border: '1px solid #cbd5e1', fontSize: 13, fontWeight: 600, cursor: 'pointer', background: filter === f ? '#4f46e5' : '#fff', color: filter === f ? '#fff' : '#475569', textTransform: 'capitalize' }}>{f === 'ALL' ? t('filterAll') : f}</button>
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={
+                filter === f
+                  ? 'cursor-pointer rounded-md bg-blue-800 px-3.5 py-2 text-xs font-semibold text-white hover:bg-blue-900'
+                  : 'cursor-pointer rounded-md border border-gray-300 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100'
+              }
+            >{f === 'ALL' ? t('filterAll') : f}</button>
           ))}
         </div>
         <Table headers={[t('tableId'), t('nameTable'), t('email'), t('roleTable'), t('statusTableUser'), t('actions')]}>
           {filtered.map(user => (
-            <tr key={user.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-              <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0ea5e9' }}>{user.id}</td>
-              <td style={{ padding: '12px 14px', color: '#0f172a', fontWeight: 600 }}>{user.name}<div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 400 }}>{user[user.role === 'owner' ? 'address' : 'department']}</div></td>
-              <td style={{ padding: '12px 14px', color: '#475569' }}>{user.email}</td>
-              <td style={{ padding: '12px 14px' }}>
-                <select value={user.role} onChange={e => setRole(user, e.target.value)} style={{ padding: '5px 8px', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: 12, textTransform: 'capitalize' }}>
+            <tr key={user.id} className="border-b border-gray-100">
+              <td className="px-4 py-3 text-sm font-bold text-blue-800">{user.id}</td>
+              <td className="px-4 py-3 text-sm font-medium text-gray-800">{user.name}<div className="text-xs font-normal text-gray-500">{user[user.role === 'owner' ? 'address' : 'department']}</div></td>
+              <td className="px-4 py-3 text-sm text-gray-700">{user.email}</td>
+              <td className="px-4 py-3">
+                <select value={user.role} onChange={e => setRole(user, e.target.value)} className="rounded-md border border-gray-300 px-2 py-1.5 text-xs text-gray-700 focus:border-blue-700 focus:outline-none">
                   <option value="owner">owner</option>
                   <option value="officer">officer</option>
                   <option value="admin">admin</option>
                 </select>
               </td>
-              <td style={{ padding: '12px 14px' }}>
-                <span style={{ fontWeight: 700, color: user.active !== false ? '#22c55e' : '#ef4444', fontSize: 12 }}>{user.active !== false ? t('active') : t('inactive')}</span>
+              <td className="px-4 py-3">
+                <span className={`text-xs font-bold ${user.active !== false ? 'text-green-800' : 'text-red-800'}`}>{user.active !== false ? t('active') : t('inactive')}</span>
               </td>
-              <td style={{ padding: '12px 14px' }}>
-                <button onClick={() => toggleActive(user)} style={miniBtn}>{user.active !== false ? t('deactivate') : t('activate')}</button>
+              <td className="px-4 py-3">
+                <button onClick={() => toggleActive(user)} className="cursor-pointer rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100">{user.active !== false ? t('deactivate') : t('activate')}</button>
                 {' '}
-                <button onClick={() => { deleteUser(user.id); setMsg({ type: 'success', text: t('deletedMsg').replace('{name}', user.name) }); }} style={{ ...miniBtn, color: '#ef4444' }}>{t('delete')}</button>
+                <button onClick={() => { deleteUser(user.id); setMsg({ type: 'success', text: t('deletedMsg').replace('{name}', user.name) }); }} className="cursor-pointer rounded-md border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50">{t('delete')}</button>
               </td>
             </tr>
           ))}
@@ -106,6 +114,3 @@ export default function AdminUsers() {
     </div>
   );
 }
-
-const addBtn = { background: '#4f46e5', color: '#fff', padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer' };
-const miniBtn = { background: '#f1f5f9', color: '#334155', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', padding: '4px 10px' };

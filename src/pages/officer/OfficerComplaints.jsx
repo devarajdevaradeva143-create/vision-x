@@ -28,18 +28,18 @@ export default function OfficerComplaints() {
             {sorted.map(c => {
               const ins = appInstruments.find(i => i.id === c.instrumentId);
               return (
-                <tr key={c.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0f172a' }}>{c.id}</td>
-                  <td style={{ padding: '12px 14px', color: '#0ea5e9', fontWeight: 600 }}>{c.certificateId}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{c.instrumentId}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{c.ownerName}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{c.complaintType}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{c.filedAt || fmt(c.submittedAt)}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{c.filedTime || '—'}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{ins?.location || '—'}</td>
-                  <td style={{ padding: '12px 14px' }}><ComplaintStatusBadge status={c.status} /></td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <Link to={`/officer/complaints/${c.id}`} style={{ color: '#0ea5e9', fontWeight: 600, fontSize: 13, textDecoration: 'none' }}>{t('viewLink')}</Link>
+                <tr key={c.id} className="border-b border-gray-100">
+                  <td className="px-4 py-3 text-sm font-bold text-gray-800">{c.id}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-blue-800">{c.certificateId}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{c.instrumentId}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{c.ownerName}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{c.complaintType}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{c.filedAt || fmt(c.submittedAt)}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{c.filedTime || '—'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{ins?.location || '—'}</td>
+                  <td className="px-4 py-3"><ComplaintStatusBadge status={c.status} /></td>
+                  <td className="px-4 py-3">
+                    <Link to={`/officer/complaints/${c.id}`} className="text-sm font-medium text-blue-800 hover:text-blue-900">{t('viewLink')}</Link>
                   </td>
                 </tr>
               );

@@ -31,7 +31,7 @@ export default function OfficerComplaintDetail() {
   const [finalRemarks, setFinalRemarks] = useState(saved.finalRemarks || '');
   const [msg, setMsg] = useState(null);
 
-  if (!complaint) return <Card><p>{t('complaintNotFound')}</p></Card>;
+  if (!complaint) return <Card><p className="text-sm text-gray-600">{t('complaintNotFound')}</p></Card>;
 
   // Resolve the EXACT certificate and instrument referenced by this complaint.
   const cert = appCertificates.find(c => c.id === complaint.certificateId);
@@ -68,6 +68,12 @@ export default function OfficerComplaintDetail() {
 
   const progress = complaint.progress || {};
 
+  const certStatusClass = (c) => {
+    if (c?.result === 'CERTIFIED') return 'text-green-800';
+    if (c?.result === 'REJECTED') return 'text-red-800';
+    return '';
+  };
+
   return (
     <div>
       <PageHeader
@@ -76,11 +82,11 @@ export default function OfficerComplaintDetail() {
         action={<ComplaintStatusBadge status={complaint.status} />}
       />
 
-      {msg && <div style={{ marginBottom: 16 }}><Alert type={msg.type}>{msg.text}</Alert></div>}
+      {msg && <div className="mb-4"><Alert type={msg.type}>{msg.text}</Alert></div>}
 
       {/* Public complaint snapshot */}
-      <Card style={{ marginBottom: 16 }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('complaintPublicSection')}</h3>
+      <Card className="mb-4">
+        <h3 className="m-0 mb-4 text-base font-bold text-gray-800">{t('complaintPublicSection')}</h3>
         <DetailRow>
           <Field label={t('complaintIdLabel')} value={complaint.id} />
           <Field label={t('certificateNumber')} value={complaint.certificateId} />
@@ -89,23 +95,23 @@ export default function OfficerComplaintDetail() {
           <Field label={t('complaintDateTime')} value={`${complaint.filedAt || fmt(complaint.submittedAt)}, ${complaint.filedTime || ''}`} />
           <Field label={t('complaintOwnerCol')} value={complaint.ownerName} />
         </DetailRow>
-        <div style={{ marginTop: 16 }}>
-          <div style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('complaintDescriptionCol')}</div>
-          <div style={{ fontSize: 14, color: '#334155', marginTop: 4 }}>{complaint.description}</div>
+        <div className="mt-4">
+          <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">{t('complaintDescriptionCol')}</div>
+          <div className="mt-1 text-sm text-gray-700">{complaint.description}</div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 20 }}>
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#475569', marginBottom: 8 }}>{t('complaintContact')}</div>
-            <div style={{ fontSize: 13, color: '#334155' }}>
+            <div className="mb-2 text-sm font-semibold text-gray-700">{t('complaintContact')}</div>
+            <div className="text-sm text-gray-700">
               <div>{complaint.contactName}</div>
               <div>{complaint.contactMobile}</div>
               {complaint.contactEmail && <div>{complaint.contactEmail}</div>}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#475569', marginBottom: 8 }}>{t('complaintGeoLocation')}</div>
-            <div style={{ fontSize: 13, color: '#334155' }}>
+            <div className="mb-2 text-sm font-semibold text-gray-700">{t('complaintGeoLocation')}</div>
+            <div className="text-sm text-gray-700">
               {complaint.latitude || complaint.longitude
                 ? <span>{t('lat')}: {complaint.latitude} · {t('lng')}: {complaint.longitude}</span>
                 : '—'}
@@ -114,23 +120,23 @@ export default function OfficerComplaintDetail() {
         </div>
 
         {/* Evidence */}
-        <div style={{ marginTop: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#475569', marginBottom: 8 }}>{t('complaintEvidenceSection')}</div>
+        <div className="mt-5">
+          <div className="mb-2 text-sm font-semibold text-gray-700">{t('complaintEvidenceSection')}</div>
           {complaint.evidence && complaint.evidence.length > 0 ? (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div className="flex flex-wrap gap-2">
               {complaint.evidence.map((e, i) => (
-                <span key={i} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '6px 10px', fontSize: 12, color: '#475569' }}>📎 {e.name}</span>
+                <span key={i} className="rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-700">📎 {e.name}</span>
               ))}
             </div>
           ) : (
-            <span style={{ fontSize: 13, color: '#94a3b8' }}>{t('noEvidenceMsg')}</span>
+            <span className="text-sm text-gray-500">{t('noEvidenceMsg')}</span>
           )}
         </div>
       </Card>
 
       {/* Certificate / instrument info from the linked record */}
-      <Card style={{ marginBottom: 16 }}>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('complaintCertInfo')}</h3>
+      <Card className="mb-4">
+        <h3 className="m-0 mb-4 text-base font-bold text-gray-800">{t('complaintCertInfo')}</h3>
         <DetailRow>
           <Field label={t('certificateNumber')} value={cert?.id || complaint.certificateId} />
           <Field label={t('applicationIdField')} value={cert?.applicationId || complaint.applicationId} />
@@ -142,7 +148,7 @@ export default function OfficerComplaintDetail() {
           <Field label={t('serialNumber')} value={cert?.serialNumber || instrument?.serialNumber} />
           <Field label={t('capacityRange')} value={cert?.capacity || instrument?.capacity} />
           <Field label={t('location')} value={cert?.location || instrument?.location} />
-          <Field label={t('certificateStatus')} value={cert?.result === 'CERTIFIED' ? t('verifiedCertified') : cert?.result === 'REJECTED' ? t('rejectedStatus') : '—'} color={cert?.result === 'CERTIFIED' ? '#22c55e' : cert?.result === 'REJECTED' ? '#ef4444' : undefined} />
+          <Field label={t('certificateStatus')} value={cert?.result === 'CERTIFIED' ? t('verifiedCertified') : cert?.result === 'REJECTED' ? t('rejectedStatus') : '—'} className={certStatusClass(cert)} />
           <Field label={t('complaintGeoLocation')} value={cert?.latitude && cert?.longitude ? `${t('lat')}: ${cert.latitude} · ${t('lng')}: ${cert.longitude}` : (instrument?.latitude && instrument?.longitude ? `${t('lat')}: ${instrument.latitude} · ${t('lng')}: ${instrument.longitude}` : '—')} />
           <Field label={t('verificationDate')} value={fmt(cert?.verificationDate)} />
           <Field label={t('expiryDate')} value={fmt(cert?.expiryDate)} />
@@ -152,59 +158,58 @@ export default function OfficerComplaintDetail() {
 
       {/* Workflow + officer actions */}
       <Card>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>{t('complaintWorkflowTitle')}</h3>
+        <h3 className="m-0 mb-4 text-base font-bold text-gray-800">{t('complaintWorkflowTitle')}</h3>
 
         {/* Progress tracker for the complaint status flow */}
-        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
+        <div className="mb-5 flex flex-wrap items-center">
           {complaintStatusFlow.map((s, i) => {
             const done = i <= currentIndex;
-            const color = done ? '#22c55e' : '#cbd5e1';
             return (
-              <div key={s} style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: '50%', background: done ? '#22c55e' : '#e2e8f0', color: done ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>
+              <div key={s} className="flex items-center">
+                <div className="flex items-center gap-1.5">
+                  <div className={`flex h-5.5 w-5.5 items-center justify-center rounded-full text-[11px] font-bold ${done ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-500'}`}>
                     {done ? (i === currentIndex ? String(i + 1) : '✓') : String(i + 1)}
                   </div>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: done ? '#15803d' : '#94a3b8' }}>{s}</span>
+                  <span className={`text-[11px] font-semibold ${done ? 'text-green-700' : 'text-gray-500'}`}>{s}</span>
                 </div>
-                {i < complaintStatusFlow.length - 1 && <div style={{ width: 20, height: 2, background: i < currentIndex ? '#22c55e' : '#e2e8f0', margin: '0 6px' }} />}
+                {i < complaintStatusFlow.length - 1 && <div className={`mx-1.5 h-0.5 w-5 ${i < currentIndex ? 'bg-green-700' : 'bg-gray-200'}`} />}
               </div>
             );
           })}
         </div>
 
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#475569', marginBottom: 12 }}>{t('complaintOfficerActions')}</div>
-        <div style={{ display: 'grid', gap: 12 }}>
+        <div className="mb-3 text-sm font-semibold text-gray-700">{t('complaintOfficerActions')}</div>
+        <div className="grid gap-3">
           <div>
             <Label>{t('inspectionRemarks')}</Label>
-            <textarea value={remarks} onChange={e => setRemarks(e.target.value)} style={{ ...input, minHeight: 60 }} />
+            <textarea value={remarks} onChange={e => setRemarks(e.target.value)} className={`${input} min-h-[60px]`} />
           </div>
           <div>
             <Label>{t('actionTakenLabel')}</Label>
-            <input value={actionTaken} onChange={e => setActionTaken(e.target.value)} style={input} />
+            <input value={actionTaken} onChange={e => setActionTaken(e.target.value)} className={input} />
           </div>
           <div>
             <Label>{t('finePenaltyLabel')}</Label>
-            <input value={finePenalty} onChange={e => setFinePenalty(e.target.value)} style={input} />
+            <input value={finePenalty} onChange={e => setFinePenalty(e.target.value)} className={input} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input type="checkbox" checked={reverification} onChange={e => setReverification(e.target.checked)} id="reverification" />
-            <label htmlFor="reverification" style={{ fontSize: 13, color: '#334155' }}>{t('reverificationRequired')}</label>
+          <div className="flex items-center gap-2">
+            <input type="checkbox" checked={reverification} onChange={e => setReverification(e.target.checked)} id="reverification" className="h-4 w-4 accent-blue-800" />
+            <label htmlFor="reverification" className="text-sm text-gray-700">{t('reverificationRequired')}</label>
           </div>
           <div>
             <Label>{t('finalResolutionRemarks')}</Label>
-            <textarea value={finalRemarks} onChange={e => setFinalRemarks(e.target.value)} style={{ ...input, minHeight: 60 }} />
+            <textarea value={finalRemarks} onChange={e => setFinalRemarks(e.target.value)} className={`${input} min-h-[60px]`} />
           </div>
         </div>
 
-        <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-          <button onClick={storeProgress} style={saveBtn}>{t('saveComplaintProgress')}</button>
+        <div className="mt-4 flex flex-wrap items-center gap-2.5">
+          <button onClick={storeProgress} className="cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100">{t('saveComplaintProgress')}</button>
           {nextStatus && (
-            <button onClick={advanceStatus} style={advanceBtn}>
+            <button onClick={advanceStatus} className="cursor-pointer rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">
               {t('markStatus').replace('{status}', t(`complaintStatus_${nextStatus.replace(/ /g, '_')}`))}
             </button>
           )}
-          <Link to="/officer/complaints" style={{ color: '#0ea5e9', fontWeight: 600, fontSize: 13, textDecoration: 'none' }}>{t('back')}</Link>
+          <Link to="/officer/complaints" className="text-sm font-medium text-blue-800 hover:text-blue-900">{t('back')}</Link>
         </div>
       </Card>
     </div>
@@ -212,19 +217,7 @@ export default function OfficerComplaintDetail() {
 }
 
 function Label({ children }) {
-  return <div style={{ fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 4 }}>{children}</div>;
+  return <div className="mb-1 text-sm font-medium text-gray-700">{children}</div>;
 }
 
-const input = {
-  width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 14, boxSizing: 'border-box', maxWidth: 500,
-};
-
-const saveBtn = {
-  background: '#f1f5f9', color: '#334155', padding: '10px 18px', borderRadius: 8,
-  fontSize: 13, fontWeight: 700, border: '1px solid #e2e8f0', cursor: 'pointer',
-};
-
-const advanceBtn = {
-  background: '#4f46e5', color: '#fff', padding: '10px 18px', borderRadius: 8,
-  fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
-};
+const input = 'w-full max-w-md rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-700 focus:outline-none';

@@ -9,6 +9,12 @@ export default function OfficerCertificates() {
   const { t } = useLanguage();
   const myCerts = appCertificates.filter(c => c.officerId === currentUser.id);
 
+  const validityClass = (info) => {
+    if (info.status === 'expired') return 'text-red-800';
+    if (info.status === 'expiring') return 'text-amber-800';
+    return 'text-green-800';
+  };
+
   return (
     <div>
       <PageHeader title={t('issuedCertificates')} subtitle={t('issuedCertificatesSubtitle')} />
@@ -20,14 +26,14 @@ export default function OfficerCertificates() {
             {myCerts.map(cert => {
               const info = expiryInfo(cert.expiryDate);
               return (
-                <tr key={cert.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0ea5e9' }}>{cert.id}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{cert.category} ({cert.instrumentId})</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{cert.ownerName}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{fmt(cert.issueDate)}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{fmt(cert.expiryDate)}</td>
-                  <td style={{ padding: '12px 14px' }}><span style={{ fontWeight: 700, color: info.color, fontSize: 13 }}>{info.label}</span></td>
-                  <td style={{ padding: '12px 14px' }}><Link to={`/certificates/${cert.applicationId}`} style={{ color: '#0ea5e9', fontWeight: 600, fontSize: 13, textDecoration: 'none' }}>{t('viewLink')}</Link></td>
+                <tr key={cert.id} className="border-b border-gray-100">
+                  <td className="px-4 py-3 text-sm font-bold text-blue-800">{cert.id}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{cert.category} ({cert.instrumentId})</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{cert.ownerName}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{fmt(cert.issueDate)}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{fmt(cert.expiryDate)}</td>
+                  <td className="px-4 py-3"><span className={`text-sm font-bold ${validityClass(info)}`}>{info.label}</span></td>
+                  <td className="px-4 py-3"><Link to={`/certificates/${cert.applicationId}`} className="text-sm font-medium text-blue-800 hover:text-blue-900">{t('viewLink')}</Link></td>
                 </tr>
               );
             })}

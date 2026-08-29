@@ -30,8 +30,8 @@ export default function OwnerInstruments() {
     setForm({ type: '', category: '', manufacturer: '', modelNumber: '', serialNumber: '', capacity: '', location: '' });
   };
 
-  const inputStyle = { width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 14 };
-  const Label = ({ children }) => <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4, marginTop: 10 }}>{children}</div>;
+  const inputStyle = 'w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-700 focus:outline-none';
+  const Label = ({ children }) => <div className="mb-1 mt-2.5 text-sm font-medium text-gray-700">{children}</div>;
 
   const selectedCategories = form.type ? instrumentCategories.find(c => c.type === form.type)?.categories || [] : [];
 
@@ -40,35 +40,35 @@ export default function OwnerInstruments() {
       <PageHeader
         title={t('myInstruments')}
         subtitle={t('registerAndManage')}
-        action={<button onClick={() => setShowForm(!showForm)} style={addBtn}>{showForm ? t('cancel') : t('addInstrument')}</button>}
+        action={<button onClick={() => setShowForm(!showForm)} className="cursor-pointer rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">{showForm ? t('cancel') : t('addInstrument')}</button>}
       />
 
       {showForm && (
-        <Card style={{ marginBottom: 20 }}>
-          <h3 style={{ margin: '0 0 12px', fontSize: 16, color: '#0f172a' }}>{t('registerNewInstrument')}</h3>
+        <Card className="mb-5">
+          <h3 className="m-0 mb-3 text-base font-bold text-gray-800">{t('registerNewInstrument')}</h3>
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <div className="grid gap-3.5 sm:grid-cols-2">
               <div>
                 <Label>{t('instrumentType')}</Label>
-                <select name="type" value={form.type} onChange={handleTypeChange} style={inputStyle} required>
+                <select name="type" value={form.type} onChange={handleTypeChange} className={inputStyle} required>
                   <option value="">{t('selectType')}</option>
                   {instrumentCategories.map(c => <option key={c.type} value={c.type}>{c.type}</option>)}
                 </select>
               </div>
               <div>
                 <Label>{t('category')}</Label>
-                <select name="category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} style={inputStyle} required disabled={!form.type}>
+                <select name="category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className={inputStyle} required disabled={!form.type}>
                   <option value="">{t('selectCategory')}</option>
                   {selectedCategories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-              <div><Label>{t('manufacturer')}</Label><input name="manufacturer" value={form.manufacturer} onChange={e => setForm({ ...form, manufacturer: e.target.value })} style={inputStyle} required /></div>
-              <div><Label>{t('modelNumber')}</Label><input name="modelNumber" value={form.modelNumber} onChange={e => setForm({ ...form, modelNumber: e.target.value })} style={inputStyle} required /></div>
-              <div><Label>{t('serialNumber')}</Label><input name="serialNumber" value={form.serialNumber} onChange={e => setForm({ ...form, serialNumber: e.target.value })} style={inputStyle} required /></div>
-              <div><Label>{t('capacityRange')}</Label><input name="capacity" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} style={inputStyle} required placeholder="e.g. 220 g" /></div>
-              <div style={{ gridColumn: '1 / -1' }}><Label>{t('location')}</Label><input name="location" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} style={inputStyle} required /></div>
+              <div><Label>{t('manufacturer')}</Label><input name="manufacturer" value={form.manufacturer} onChange={e => setForm({ ...form, manufacturer: e.target.value })} className={inputStyle} required /></div>
+              <div><Label>{t('modelNumber')}</Label><input name="modelNumber" value={form.modelNumber} onChange={e => setForm({ ...form, modelNumber: e.target.value })} className={inputStyle} required /></div>
+              <div><Label>{t('serialNumber')}</Label><input name="serialNumber" value={form.serialNumber} onChange={e => setForm({ ...form, serialNumber: e.target.value })} className={inputStyle} required /></div>
+              <div><Label>{t('capacityRange')}</Label><input name="capacity" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} className={inputStyle} required placeholder="e.g. 220 g" /></div>
+              <div className="sm:col-span-2"><Label>{t('location')}</Label><input name="location" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} className={inputStyle} required /></div>
             </div>
-            <button style={{ ...addBtn, marginTop: 16 }}>{t('saveInstrument')}</button>
+            <button className="mt-4 cursor-pointer rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">{t('saveInstrument')}</button>
           </form>
         </Card>
       )}
@@ -81,21 +81,21 @@ export default function OwnerInstruments() {
             {myInstruments.map(ins => {
               const cert = appCertificates.find(c => c.instrumentId === ins.id);
               return (
-              <tr key={ins.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0ea5e9' }}>{ins.id}</td>
-                <td style={{ padding: '12px 14px' }}>{ins.category}</td>
-                <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.manufacturer}</td>
-                <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.modelNumber}</td>
-                <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.serialNumber}</td>
-                <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.capacity}</td>
-                <td style={{ padding: '12px 14px', color: '#475569' }}>{ins.location}</td>
-                <td style={{ padding: '12px 14px' }}>
+              <tr key={ins.id} className="border-b border-gray-100">
+                <td className="px-4 py-3 text-sm font-bold text-blue-800">{ins.id}</td>
+                <td className="px-4 py-3 text-sm text-gray-800">{ins.category}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">{ins.manufacturer}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">{ins.modelNumber}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">{ins.serialNumber}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">{ins.capacity}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">{ins.location}</td>
+                <td className="px-4 py-3">
                   {cert ? (
                     <Link to={`/certificates/${cert.applicationId}`} title="View certificate QR">
                       <QRCodeSVG value={buildVerifyUrl(cert.id)} size={40} />
                     </Link>
                   ) : (
-                    <span style={{ color: '#cbd5e1', fontSize: 12 }}>—</span>
+                    <span className="text-xs text-gray-300">—</span>
                   )}
                 </td>
               </tr>
@@ -107,8 +107,3 @@ export default function OwnerInstruments() {
     </div>
   );
 }
-
-const addBtn = {
-  background: '#4f46e5', color: '#fff', padding: '10px 18px', borderRadius: 8,
-  fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer',
-};

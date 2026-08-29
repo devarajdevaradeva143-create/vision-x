@@ -32,45 +32,58 @@ export default function Register() {
     }
   };
 
-  const inputStyle = { width: '100%', padding: '10px 12px', border: '1px solid #cbd5e1', borderRadius: 8, fontSize: 14 };
+  const inputStyle = 'w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-700 focus:outline-none';
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <div style={{ width: '100%', maxWidth: 480, background: '#fff', borderRadius: 16, padding: 36, boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-          <Scale size={32} color="#4f46e5" />
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 18, color: '#0f172a' }}>Register Owner</div>
-            <div style={{ fontSize: 12, color: '#64748b' }}>Create your instrument owner account</div>
-          </div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4 sm:p-6">
+      <div className="w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="flex h-1.5">
+          <div className="flex-1 bg-blue-800" />
+          <div className="flex-1 bg-amber-400" />
+          <div className="flex-1 bg-green-700" />
         </div>
+        <div className="p-6 sm:p-8">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-800 text-amber-400">
+              <Scale size={24} />
+            </div>
+            <div>
+              <div className="text-base font-bold text-gray-800">Register Owner</div>
+              <div className="text-xs text-gray-600">Create your instrument owner account</div>
+            </div>
+          </div>
 
-        {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '10px', borderRadius: 8, display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, marginBottom: 16 }}><AlertCircle size={16} /> {error}</div>}
+          {error && (
+            <div className="mb-4 flex items-center gap-2 rounded-md border border-red-200 bg-red-100 px-3 py-2.5 text-sm text-red-800">
+              <AlertCircle size={16} /> {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit}>
-          <Label>Full Name</Label>
-          <input name="name" value={form.name} onChange={handleChange} style={inputStyle} required />
+          <form onSubmit={handleSubmit}>
+            <Label>Full Name</Label>
+            <input name="name" value={form.name} onChange={handleChange} className={inputStyle} required />
 
-          <Label>Email</Label>
-          <input type="email" name="email" value={form.email} onChange={handleChange} style={inputStyle} required />
+            <Label>Email</Label>
+            <input type="email" name="email" value={form.email} onChange={handleChange} className={inputStyle} required />
 
-          <Label>Phone</Label>
-          <input name="phone" value={form.phone} onChange={handleChange} style={inputStyle} required />
+            <Label>Phone</Label>
+            <input name="phone" value={form.phone} onChange={handleChange} className={inputStyle} required />
 
-          <Label>Address</Label>
-          <input name="address" value={form.address} onChange={handleChange} style={inputStyle} required />
+            <Label>Address</Label>
+            <input name="address" value={form.address} onChange={handleChange} className={inputStyle} required />
 
-          <Label>Password</Label>
-          <input type="password" name="password" value={form.password} onChange={handleChange} style={inputStyle} required />
+            <Label>Password</Label>
+            <input type="password" name="password" value={form.password} onChange={handleChange} className={inputStyle} required />
 
-          <Label>Confirm Password</Label>
-          <input type="password" name="confirm" value={form.confirm} onChange={handleChange} style={inputStyle} required />
+            <Label>Confirm Password</Label>
+            <input type="password" name="confirm" value={form.confirm} onChange={handleChange} className={inputStyle} required />
 
-          <button style={{ width: '100%', padding: '12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', marginTop: 24 }}>Register</button>
-        </form>
+            <button className="mt-5 w-full cursor-pointer rounded-md bg-blue-800 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-900">Register</button>
+          </form>
 
-        <div style={{ marginTop: 16, fontSize: 13, textAlign: 'center' }}>
-          Already have an account? <Link to="/login" style={{ color: '#0ea5e9', fontWeight: 700 }}>Login</Link>
+          <div className="mt-4 text-center text-sm">
+            Already have an account? <Link to="/login" className="font-semibold text-blue-800 hover:text-blue-900">Login</Link>
+          </div>
         </div>
       </div>
     </div>
@@ -78,5 +91,5 @@ export default function Register() {
 }
 
 function Label({ children }) {
-  return <div style={{ fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6, marginTop: 14 }}>{children}</div>;
+  return <div className="mb-1.5 mt-3 text-sm font-semibold text-gray-700">{children}</div>;
 }

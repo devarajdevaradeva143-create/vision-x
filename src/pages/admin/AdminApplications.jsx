@@ -18,13 +18,13 @@ export default function AdminApplications() {
               const owner = appUsers.find(u => u.id === app.ownerId);
               const officer = app.officerId ? appUsers.find(u => u.id === app.officerId) : null;
               return (
-                <tr key={app.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0f172a' }}>{app.id}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{ins?.category} ({ins?.id})</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{owner?.name}</td>
-                  <td style={{ padding: '12px 14px', color: officer ? '#475569' : '#94a3b8' }}>{officer?.name || t('unassigned')}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{fmt(app.submissionDate)}</td>
-                  <td style={{ padding: '12px 14px' }}><StatusBadge status={app.status} /></td>
+                <tr key={app.id} className="border-b border-gray-100">
+                  <td className="px-4 py-3 text-sm font-bold text-gray-800">{app.id}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{ins?.category} ({ins?.id})</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{owner?.name}</td>
+                  <td className={`px-4 py-3 text-sm ${officer ? 'text-gray-700' : 'text-gray-400'}`}>{officer?.name || t('unassigned')}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{fmt(app.submissionDate)}</td>
+                  <td className="px-4 py-3"><StatusBadge status={app.status} /></td>
                 </tr>
               );
             })}
