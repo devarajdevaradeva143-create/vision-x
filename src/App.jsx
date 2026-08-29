@@ -15,6 +15,7 @@ import OfficerCertificates from './pages/officer/OfficerCertificates';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminInstruments from './pages/admin/AdminInstruments';
+import AdminQR from './pages/admin/AdminQR';
 import AdminApplications from './pages/admin/AdminApplications';
 import AdminCertificates from './pages/admin/AdminCertificates';
 import PublicVerify from './pages/PublicVerify';
@@ -58,6 +59,7 @@ export default function App() {
         <Route path="/admin/instruments" element={<Protected><Layout><RoleOnly role="admin"><AdminInstruments /></RoleOnly></Layout></Protected>} />
         <Route path="/admin/applications" element={<Protected><Layout><RoleOnly role="admin"><AdminApplications /></RoleOnly></Layout></Protected>} />
         <Route path="/admin/certificates" element={<Protected><Layout><RoleOnly role="admin"><AdminCertificates /></RoleOnly></Layout></Protected>} />
+        <Route path="/admin/qr" element={<Protected><Layout><RoleOnly role="admin"><AdminQR /></RoleOnly></Layout></Protected>} />
         <Route path="/admin/status" element={<Protected><Layout><AdminDashboard /></Layout></Protected>} />
 
         <Route path="/" element={<RootRedirect />} />

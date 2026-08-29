@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Scale, LogOut, Users, ClipboardCheck, FileBadge2, Gauge, LayoutDashboard, ShieldCheck } from 'lucide-react';
+import { Scale, LogOut, Users, ClipboardCheck, FileBadge2, Gauge, LayoutDashboard, ShieldCheck, QrCode } from 'lucide-react';
 
 const roleLabels = {
   owner: 'Instrument Owner',
@@ -53,6 +53,7 @@ export default function Layout({ children }) {
               <MenuLink to="/admin/applications" icon={<ClipboardCheck size={18} />} label="Applications" />
               <MenuLink to="/admin/certificates" icon={<FileBadge2 size={18} />} label="Certificates" />
               <MenuLink to="/admin/status" icon={<ShieldCheck size={18} />} label="System Status" />
+              <MenuLink to="/admin/qr" icon={<QrCode size={18} />} label="Fees & Payment QR" />
             </>
           )}
           <MenuLink to="/verify" icon={<ShieldCheck size={18} />} label="Public Verify" />
