@@ -24,6 +24,15 @@ export default function OfficerApplicationDetail() {
   const certificate = appCertificates.find(c => c.applicationId === app.id);
   const suppressible = app.status === 'SCHEDULED' || app.status === 'SUBMITTED';
 
+  // Show the machine details the owner actually submitted (snapshot on the app),
+  // falling back to the linked instrument / user where needed.
+  const machineType = app.machineType || instrument?.category;
+  const manufacturer = app.manufacturer ?? instrument?.manufacturer;
+  const model = app.modelNumber ?? instrument?.modelNumber;
+  const serial = app.serialNumber ?? instrument?.serialNumber;
+  const capacity = app.capacity ?? instrument?.capacity;
+  const location = app.location ?? instrument?.location;
+
   const handleSchedule = () => {
     if (!scheduleDate) return;
     if (!app.officerId) {
@@ -88,17 +97,15 @@ export default function OfficerApplicationDetail() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <Card>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>Instrument</h3>
-          {instrument && (
-            <DetailRow>
-              <Field label="Instrument ID" value={instrument.id} />
-              <Field label="Category" value={instrument.category} />
-              <Field label="Manufacturer" value={instrument.manufacturer} />
-              <Field label="Model" value={instrument.modelNumber} />
-              <Field label="Serial No." value={instrument.serialNumber} />
-              <Field label="Capacity" value={instrument.capacity} />
-              <Field label="Location" value={instrument.location} />
-            </DetailRow>
-          )}
+          <DetailRow>
+            <Field label="Machine / Instrument Type" value={machineType} />
+            <Field label="Machine ID" value={app.instrumentId || '—'} />
+            <Field label="Manufacturer" value={manufacturer} />
+            <Field label="Model" value={model} />
+            <Field label="Serial No." value={serial} />
+            <Field label="Capacity" value={capacity} />
+            <Field label="Location" value={location} />
+          </DetailRow>
         </Card>
         <Card>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>Owner</h3>
@@ -110,6 +117,16 @@ export default function OfficerApplicationDetail() {
           </DetailRow>
         </Card>
       </div>
+
+      <Card style={{ marginTop: 16 }}>
+        <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>Application Details</h3>
+        <DetailRow>
+          <Field label="Application ID" value={app.id} />
+          <Field label="Application Date" value={fmt(app.submissionDate)} />
+          <Field label="Payment Status" value={app.paymentStatus === 'PAID' ? 'Paid' : 'Pending'} color={app.paymentStatus === 'PAID' ? '#22c55e' : '#f59e0b'} />
+          <Field label="Application Status" value={app.status} />
+        </DetailRow>
+      </Card>
 
       <Card style={{ marginTop: 16 }}>
         <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0f172a' }}>Inspection Actions</h3>

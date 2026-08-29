@@ -212,8 +212,19 @@ export function getExpiryStatus(expiryDate) {
   return { status: 'valid', label: 'Valid', color: 'green', days: diffDays };
 }
 
+// Default officer that a new (SUBMITTED) application is assigned to.
+export function getDefaultOfficer() {
+  return (users.find(u => u.role === 'officer') || {}).id;
+}
+
+// Application IDs continue after the seeded mock data and any runtime-created
+// applications (read from localStorage) so they never collide.
 export function generateApplicationId() {
-  const num = applications.length + 1;
+  const runtime = (() => {
+    try { const raw = localStorage.getItem('lm_app_applications'); if (raw) return JSON.parse(raw).length; } catch {}
+    return 0;
+  })();
+  const num = Math.max(applications.length, runtime) + 1;
   return `APP-2026-${String(num).padStart(3, '0')}`;
 }
 

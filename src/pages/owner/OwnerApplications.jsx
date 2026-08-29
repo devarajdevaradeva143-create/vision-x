@@ -20,19 +20,28 @@ export default function OwnerApplications() {
   // The fee is derived from the selected machine type (not entered manually).
   const feeForType = getMachineTypeByName(machineType)?.fee;
 
+  // Optional machine details (used when no linked instrument is selected) so the
+  // officer always sees the complete submitted instrument info.
+  const [details, setDetails] = useState({ manufacturer: '', modelNumber: '', serialNumber: '', capacity: '', location: '' });
+
   const submitApplication = () => {
     if (!machineType) {
       setError('Please select a machine type for verification.');
       return;
     }
-    // A new application starts in the "Payment Pending" state. It moves to
-    // "Submitted" only after the owner completes payment on the detail page.
+    // Snapshot the machine details into THIS application object (same ID through
+    // the whole flow) so the officer shows exactly what the owner submitted.
+    const linked = appInstruments.find(i => i.id === selectedInstrument);
+    const machine = linked
+      ? { manufacturer: linked.manufacturer, modelNumber: linked.modelNumber, serialNumber: linked.serialNumber, capacity: linked.capacity, location: linked.location }
+      : details;
     const app = {
       id: generateApplicationId(),
       instrumentId: selectedInstrument || null,
       ownerId: currentUser.id,
       officerId: null,
       machineType,
+      ...machine,
       submissionDate: new Date().toISOString().slice(0, 10),
       scheduledDate: null,
       inspectionDate: null,
@@ -45,6 +54,7 @@ export default function OwnerApplications() {
     setShowForm(false);
     setMachineType('');
     setSelectedInstrument('');
+    setDetails({ manufacturer: '', modelNumber: '', serialNumber: '', capacity: '', location: '' });
     setError('');
   };
 
@@ -70,9 +80,20 @@ export default function OwnerApplications() {
 
           <div style={{ fontSize: 13, fontWeight: 600, color: '#334155', margin: '14px 0 6px' }}>Instrument (optional)</div>
           <select value={selectedInstrument} onChange={e => setSelectedInstrument(e.target.value)} style={selectStyle}>
-            <option value="">No instrument (add later)</option>
+            <option value="">No instrument (add details below)</option>
             {myInstruments.map(ins => <option key={ins.id} value={ins.id}>{ins.category} — {ins.modelNumber} ({ins.id})</option>)}
           </select>
+
+          {!selectedInstrument && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+              {[['manufacturer', 'Manufacturer'], ['modelNumber', 'Model'], ['serialNumber', 'Serial Number'], ['capacity', 'Capacity / Range'], ['location', 'Location']].map(([key, label]) => (
+                <div key={key} style={key === 'location' ? { gridColumn: '1 / -1' } : {}}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', marginBottom: 4 }}>{label}</div>
+                  <input value={details[key]} onChange={e => setDetails(d => ({ ...d, [key]: e.target.value }))} style={selectStyle} placeholder={`e.g. ${key === 'location' ? 'Mumbai Central Lab' : key === 'capacity' ? '220 g' : 'Mettler Toledo'}`} />
+                </div>
+              ))}
+            </div>
+          )}
 
           {machineType && (
             <div style={{ marginTop: 14, background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: 12, fontSize: 14, color: '#1e40af' }}>

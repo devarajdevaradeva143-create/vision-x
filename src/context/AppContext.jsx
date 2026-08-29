@@ -1,14 +1,25 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { users, applications, certificates, instruments } from '../data/mockData';
 
 const AppContext = createContext(null);
 
+// Persist each collection to localStorage so the Owner and the Officer always
+// read the SAME application data, even across refreshes / session switches.
+function usePersistedState(key, initial) {
+  const [value, setValue] = useState(() => {
+    try { const raw = localStorage.getItem(key); if (raw) return JSON.parse(raw); } catch {}
+    return initial;
+  });
+  useEffect(() => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }, [key, value]);
+  return [value, setValue];
+}
+
 export function AppProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [appUsers, setAppUsers] = useState(users);
-  const [appApplications, setAppApplications] = useState(applications);
-  const [appCertificates, setAppCertificates] = useState(certificates);
-  const [appInstruments, setAppInstruments] = useState(instruments);
+  const [appUsers, setAppUsers] = usePersistedState('lm_app_users', users);
+  const [appApplications, setAppApplications] = usePersistedState('lm_app_applications', applications);
+  const [appCertificates, setAppCertificates] = usePersistedState('lm_app_certificates', certificates);
+  const [appInstruments, setAppInstruments] = usePersistedState('lm_app_instruments', instruments);
 
   const login = (email, password) => {
     const user = appUsers.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);

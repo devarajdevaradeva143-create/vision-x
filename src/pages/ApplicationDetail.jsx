@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { Card, PageHeader, StatusBadge, ProgressTracker, Field, DetailRow } from '../components/ui';
 import { QRCodeSVG } from 'qrcode.react';
 import { getMachineTypeByName, qrDataFor } from '../data/machineTypes';
+import { getDefaultOfficer } from '../data/mockData';
 import { fmt } from '../utils/format';
 
 // ---------------------------------------------------------------------------
@@ -45,8 +46,10 @@ export default function ApplicationDetail() {
   const isPaid = app.paymentStatus === 'PAID';
 
   const completePayment = () => {
-    // Once paid, the application becomes "Submitted" and the tester can process it.
-    updateApplication(app.id, { paymentStatus: 'PAID', status: 'SUBMITTED' });
+    // Once paid, the application becomes "Submitted". Assign a default officer
+    // so the SAME application (same ID) appears in that officer's dashboard —
+    // we only update this one application object, never create a new one.
+    updateApplication(app.id, { paymentStatus: 'PAID', status: 'SUBMITTED', officerId: getDefaultOfficer() });
     setShowPayment(false);
   };
 

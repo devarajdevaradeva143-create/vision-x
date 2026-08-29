@@ -7,9 +7,12 @@ import { fmt } from '../../utils/format';
 const filters = ['ALL', 'SUBMITTED', 'SCHEDULED', 'INSPECTED', 'CERTIFIED', 'REJECTED'];
 
 export default function OfficerApplications() {
-  const { currentUser, appApplications, appInstruments, appUsers } = useApp();
-  const [filter, setFilter] = useState('ALL');
+  const { currentUser, appApplications, appUsers } = useApp();
+  const [filter, setFilter] = useState('SUBMITTED');
 
+  // Show only applications assigned to this officer (currentUser.id). New owner
+  // submissions are assigned to OFF001 on payment, so they surface here as the
+  // exact same application the owner submitted.
   const myApps = appApplications.filter(a => a.officerId === currentUser.id);
   const filtered = filter === 'ALL' ? myApps : myApps.filter(a => a.status === filter);
 
@@ -30,15 +33,14 @@ export default function OfficerApplications() {
         <EmptyState message="No applications in this category." />
       ) : (
         <Card>
-          <Table headers={['App ID', 'Instrument', 'Category', 'Owner', 'Submitted', 'Scheduled', 'Status', '']}>
+          <Table headers={['App ID', 'Instrument', 'Owner', 'Submitted', 'Scheduled', 'Status', '']}>
             {filtered.map(app => {
-              const ins = appInstruments.find(i => i.id === app.instrumentId);
+              const machineType = app.machineType || appInstruments.find(i => i.id === app.instrumentId)?.category;
               const owner = appUsers.find(u => u.id === app.ownerId);
               return (
                 <tr key={app.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                   <td style={{ padding: '12px 14px', fontWeight: 700, color: '#0f172a' }}>{app.id}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{ins?.id}</td>
-                  <td style={{ padding: '12px 14px', color: '#475569' }}>{ins?.category}</td>
+                  <td style={{ padding: '12px 14px', color: '#475569' }}>{machineType}</td>
                   <td style={{ padding: '12px 14px', color: '#475569' }}>{owner?.name}</td>
                   <td style={{ padding: '12px 14px', color: '#475569' }}>{fmt(app.submissionDate)}</td>
                   <td style={{ padding: '12px 14px', color: app.scheduledDate ? '#475569' : '#94a3b8' }}>{app.scheduledDate ? fmt(app.scheduledDate) : '—'}</td>
