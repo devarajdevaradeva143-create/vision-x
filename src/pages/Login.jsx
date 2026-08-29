@@ -22,7 +22,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4 sm:p-6">
-      <div className="w-full max-w-4xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="w-full max-w-5xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
         {/* Government accent band */}
         <div className="flex h-1.5">
           <div className="flex-1 bg-blue-800" />
@@ -77,24 +77,11 @@ export default function Login() {
             <div className="mt-4 text-sm">
               New owner? <Link to="/register" className="font-semibold text-blue-800 hover:text-blue-900">Register here</Link>
             </div>
-
-            <div className="mt-6 rounded-md border border-gray-200 bg-gray-50 p-4 text-xs text-gray-600">
-              <div className="mb-2 font-semibold text-gray-800">Demo Accounts</div>
-              <div className="grid gap-1">
-                <DemoRow role="Owner" email="rajesh@example.com" pass="owner123" />
-                <DemoRow role="Officer" email="vikram@gov.in" pass="officer123" />
-                <DemoRow role="Admin" email="admin@gov.in" pass="admin123" />
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
-
-function DemoRow({ role, email, pass }) {
-  return <div><b className="text-gray-800">{role}:</b> {email} / {pass}</div>;
 }
 
 function Label({ children }) {
