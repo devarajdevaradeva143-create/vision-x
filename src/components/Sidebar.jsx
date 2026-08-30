@@ -1,7 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
-import LanguageSelector from './LanguageSelector';
 import { Scale, LogOut, Users, ClipboardCheck, FileBadge2, Gauge, LayoutDashboard, ShieldCheck, Flag, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 const roleLabelKeys = {
@@ -36,7 +35,6 @@ export default function Sidebar({ collapsed, onToggle }) {
             </div>
           )}
         </div>
-        {!collapsed && <LanguageSelector />}
       </div>
 
       <div className="flex justify-end px-2 py-2 lg:justify-center">
