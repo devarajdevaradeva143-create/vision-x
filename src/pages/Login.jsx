@@ -162,19 +162,19 @@ export default function Login() {
                 <div className="flex-1 bg-amber-400" />
                 <div className="flex-1 bg-green-700" />
               </div>
-              <div className="p-8 sm:p-10">
-                <div className="text-center mb-10">
-                  <h2 className="text-3xl font-bold text-gray-800 m-0">Welcome Back!</h2>
+              <div className="p-10 sm:p-12">
+                <div className="text-center mb-12">
+                  <h2 className="text-4xl font-bold text-gray-800 m-0">Welcome Back!</h2>
                   <p className="mt-2 text-base text-gray-500">Sign in to access your dashboard</p>
                 </div>
 
                 {error && (
-                  <div className="mb-8 flex items-center gap-2 rounded-md border border-red-200 bg-red-100 px-3 py-2.5 text-sm text-red-800">
+                  <div className="mb-10 flex items-center gap-2 rounded-md border border-red-200 bg-red-100 px-3 py-2.5 text-sm text-red-800">
                     <AlertCircle size={16} /> {error}
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-7">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
                     <div className="relative">
@@ -200,7 +200,7 @@ export default function Login() {
                         onChange={e => setPassword(e.target.value)}
                         placeholder="••••••••"
                         required
-                        className="w-full pl-10 pr-12 py-3 rounded-lg border border-gray-300 text-sm text-gray-800 focus:border-[#0D2B43] focus:outline-none focus:ring-1 focus:ring-[#0D2B43]"
+                        className="w-full pl-10 pr-12 py-4 rounded-lg border border-gray-300 text-sm text-gray-800 focus:border-[#0D2B43] focus:outline-none focus:ring-1 focus:ring-[#0D2B43]"
                       />
                       <button
                         type="button"
@@ -215,13 +215,13 @@ export default function Login() {
 
                   <button
                     type="submit"
-                    className="w-full cursor-pointer rounded-lg bg-[#0D2B43] px-4 py-4 text-base font-semibold text-white hover:bg-[#0A2338] transition-colors"
+                    className="w-full cursor-pointer rounded-lg bg-[#0D2B43] px-4 py-5 text-base font-semibold text-white hover:bg-[#0A2338] transition-colors"
                   >
                     Sign In
                   </button>
                 </form>
 
-                <div className="mt-8 text-sm text-center">
+                <div className="mt-10 text-sm text-center">
                   New user? <Link to="/register" className="font-semibold text-[#0D2B43] hover:text-amber-600 ml-1">Register here</Link>
                 </div>
               </div>
