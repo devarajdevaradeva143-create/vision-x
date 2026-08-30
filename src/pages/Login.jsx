@@ -22,7 +22,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4 sm:p-6">
-      <div className="w-full max-w-5xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="w-full max-w-5xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm min-h-[440px]">
         {/* Government accent band */}
         <div className="flex h-1.5">
           <div className="flex-1 bg-[#163A5F]" />
@@ -31,7 +31,7 @@ export default function Login() {
         </div>
 
         <div className="grid md:grid-cols-2">
-          <div className="flex flex-col justify-center bg-[#163A5F] p-8 text-white lg:p-10">
+          <div className="flex flex-col justify-center bg-[#163A5F] p-10 text-white lg:p-12">
             <div className="mb-5 flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#163A5F] text-amber-400">
                 <Scale size={32} />
@@ -52,7 +52,7 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="p-6 sm:p-8 lg:p-10">
+          <div className="p-8 sm:p-10 lg:p-12">
             <h2 className="m-0 text-lg font-bold text-gray-800">Login</h2>
             <p className="mt-1 mb-5 text-sm text-gray-600">Sign in to access your dashboard</p>
 
