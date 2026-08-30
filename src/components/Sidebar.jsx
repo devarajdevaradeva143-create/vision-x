@@ -22,10 +22,10 @@ export default function Sidebar({ collapsed, onToggle }) {
   const widthClass = collapsed ? 'lg:w-16' : 'lg:w-64';
 
   return (
-    <aside className={`bg-blue-900 text-gray-100 lg:fixed lg:inset-y-0 lg:left-0 lg:z-20 lg:flex lg:flex-col transition-[width] duration-200 ease-in-out ${widthClass}`}>
+    <aside className={`bg-[#163A5F] text-gray-100 lg:fixed lg:inset-y-0 lg:left-0 lg:z-20 lg:flex lg:flex-col transition-[width] duration-200 ease-in-out ${widthClass}`}>
       <div className="flex items-center justify-between border-b border-blue-800 px-4 py-4 lg:px-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-800 text-amber-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[#163A5F] text-amber-400">
             <Scale size={26} />
           </div>
           {!collapsed && (
@@ -40,7 +40,7 @@ export default function Sidebar({ collapsed, onToggle }) {
       <div className="flex justify-end px-2 py-2 lg:justify-center">
         <button
           onClick={onToggle}
-          className="inline-flex items-center justify-center rounded-md border border-blue-700 bg-blue-800 p-2 text-blue-100 hover:bg-blue-700 hover:text-white"
+          className="inline-flex items-center justify-center rounded-md border border-blue-700 bg-[#163A5F] p-2 text-blue-100 hover:bg-blue-700 hover:text-white"
           title={t('portalName')}
         >
           {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
@@ -82,7 +82,7 @@ export default function Sidebar({ collapsed, onToggle }) {
           <div className="flex justify-center">
             <button
               onClick={handleLogout}
-              className="flex items-center justify-center rounded-md border border-blue-700 bg-blue-800 p-2 text-red-200 hover:bg-blue-700 hover:text-red-100"
+              className="flex items-center justify-center rounded-md border border-blue-700 bg-[#163A5F] p-2 text-red-200 hover:bg-blue-700 hover:text-red-100"
               title={t('logout')}
             >
               <LogOut size={16} />
@@ -94,7 +94,7 @@ export default function Sidebar({ collapsed, onToggle }) {
             <div className="mb-2 text-xs text-blue-200">{t(roleLabelKeys[currentUser?.role])}</div>
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-2 rounded-md border border-blue-700 bg-blue-800 px-3 py-2 text-sm font-semibold text-red-200 hover:bg-blue-700 hover:text-red-100"
+              className="flex w-full items-center gap-2 rounded-md border border-blue-700 bg-[#163A5F] px-3 py-2 text-sm font-semibold text-red-200 hover:bg-blue-700 hover:text-red-100"
             >
               <LogOut size={16} /> {t('logout')}
             </button>
@@ -115,8 +115,8 @@ function MenuLink({ to, icon, label, collapsed }) {
           collapsed ? 'lg:justify-center lg:px-0' : ''
         } ${
           isActive
-            ? 'border-amber-400 bg-blue-800 font-semibold text-white'
-            : 'border-transparent text-blue-100 hover:bg-blue-800 hover:text-white'
+            ? 'border-amber-400 bg-[#163A5F] font-semibold text-white'
+            : 'border-transparent text-blue-100 hover:bg-[#163A5F] hover:text-white'
         }`
       }
     >
