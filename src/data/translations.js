@@ -35,6 +35,7 @@ export const translations = {
     roleOwner: 'Instrument Owner',
     roleOfficer: 'Government Officer / Tester',
     roleAdmin: 'Administrator',
+    rolePublic: 'Public User',
     language: 'Language',
     appNav: 'Main navigation',
 
@@ -139,7 +140,6 @@ export const translations = {
     certificateIssuedOn: 'Certificate {id} issued on {date}',
     applicationNotFound: 'Application not found.',
 
-    // ---------------- Payment flow (simulated) ----------------
     payNow: 'Pay Now',
     waitingForPayment: 'Waiting for payment...',
     paymentPending: 'Payment Pending',
@@ -150,8 +150,7 @@ export const translations = {
     scanAndPay: 'Scan & Pay',
     qrNotAvailable: 'Payment QR is not available for this machine type.\nPlease contact the administrator.',
     countdownTimer: 'Time remaining: {time}',
-    demoPayment: 'This is a simulated/demo payment. No real bank transaction is involved.',
-    demoTxnNote: 'Demo transaction — no real payment',
+    qrValidFor: 'QR Code Valid: {time}',
 
     // ---------------- Admin QR management ----------------
     machineTypeQR: 'Machine Type QR Codes',
@@ -490,6 +489,7 @@ export const translations = {
     roleOwner: 'கருவி உரிமையாளர்',
     roleOfficer: 'அரசு அதிகாரி / சோதனையாளர்',
     roleAdmin: 'நிர்வாகி',
+    rolePublic: 'Public User',
     language: 'மொழி',
     appNav: 'முதன்மை வழிசெலுத்தல்',
 
@@ -594,8 +594,6 @@ export const translations = {
     certificateIssuedOn: '{date} அன்று {id} சான்றிதழ் வழங்கப்பட்டது',
     applicationNotFound: 'விண்ணப்பம் கிடைக்கவில்லை.',
 
-    // ---------------- Payment flow (simulated) ----------------
-    payNow: 'செலுத்து',
     waitingForPayment: 'கட்டணம் காத்திருக்கிறது...',
     paymentPending: 'கட்டணம் நிலுவையில்',
     paymentPaid: 'கட்டணம் செலுத்தப்பட்டது',
@@ -605,8 +603,7 @@ export const translations = {
     scanAndPay: 'ஸ்கேன் மற்றும் செலுத்து',
     qrNotAvailable: 'இந்த இயந்திர வகைக்கு கட்டணம் கோணையம் கிடைக்கவில்லை.\nதயவு செய்து நிர்வாகியுடன் தொடர்புகொள்ளவும்.',
     countdownTimer: 'எஞ்சல் நேரம்: {time}',
-    demoPayment: 'இது கட்டமீட்டு/விமர்சன கட்டணம். உண்மையான வங்கி சமர்ப்பம் இல்லை.',
-    demoTxnNote: 'விமர்சன சமர்ப்பம் — உண்மையான கட்டணம் இல்லை',
+    qrValidFor: 'QR code valid for {time}',
 
     // ---------------- Admin QR management ----------------
     machineTypeQR: 'இயந்திர வகை QR குறியீடுகள்',
@@ -945,6 +942,7 @@ export const translations = {
     roleOwner: 'उपकरण स्वामी',
     roleOfficer: 'सरकारी अधिकारी / परीक्षक',
     roleAdmin: 'प्रशासक',
+    rolePublic: 'Public User',
     language: 'भाषा',
     appNav: 'मुख्य नेविगेशन',
 
@@ -1355,6 +1353,7 @@ export const translations = {
     roleOwner: 'ഉപകരണ ഉടമ',
     roleOfficer: 'സർക്കാർ ഓഫീസർ / ടെസ്റ്റർ',
     roleAdmin: 'അഡ്മിനിസ്ട്രേറ്റർ',
+    rolePublic: 'Public User',
     language: 'ഭാഷ',
     appNav: 'പ്രധാന നാവിഗേഷൻ',
 
@@ -1765,6 +1764,7 @@ export const translations = {
     roleOwner: 'যন্ত্রের মালিক',
     roleOfficer: 'সরকারি কর্মকর্তা / পরীক্ষক',
     roleAdmin: 'অ্যাডমিনিস্ট্রেটর',
+    rolePublic: 'Public User',
     language: 'ভাষা',
     appNav: 'প্রধান নেভিগেশন',
 
@@ -2175,6 +2175,7 @@ export const translations = {
     roleOwner: 'పరికర యజమాని',
     roleOfficer: 'ప్రభుత్వ అధికారి / పరీక్షకుడు',
     roleAdmin: 'నిర్వాహకుడు',
+    rolePublic: 'Public User',
     language: 'భాష',
     appNav: 'ప్రధాన నావిగేషన్',
 
@@ -2585,6 +2586,7 @@ export const translations = {
     roleOwner: 'ಉಪಕರಣ ಮಾಲೀಕ',
     roleOfficer: 'ಸರ್ಕಾರಿ ಅಧಿಕಾರಿ / ಪರೀಕ್ಷಕ',
     roleAdmin: 'ನಿರ್ವಾಹಕ',
+    rolePublic: 'Public User',
     language: 'ಭಾಷೆ',
     appNav: 'ಮುಖ್ಯ ನ್ಯಾವಿಗೇಷನ್',
 

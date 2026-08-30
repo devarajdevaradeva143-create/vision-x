@@ -13,6 +13,7 @@ export const users = [
   { id: 'OFF003', name: 'Inspector Ramesh Gupta', email: 'ramesh@gov.in', password: 'officer123', role: 'officer', phone: '9123456782', department: 'Legal Metrology, Gujarat' },
 
   { id: 'ADM001', name: 'System Administrator', email: 'admin@gov.in', password: 'admin123', role: 'admin', phone: '9000000000', department: 'Legal Metrology Department - HQ' },
+  { id: 'PUB001', name: 'Kumar Senthil', email: 'public@example.com', password: 'public123', role: 'public', phone: '9988776655', address: '456 Market Street, Chennai, Tamil Nadu' },
 ];
 
 export const instrumentCategories = [

@@ -7,6 +7,7 @@ const roleLabelKeys = {
   owner: 'roleOwner',
   officer: 'roleOfficer',
   admin: 'roleAdmin',
+  public: 'rolePublic',
 };
 
 export default function Sidebar({ collapsed, onToggle }) {

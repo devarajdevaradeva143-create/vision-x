@@ -1,7 +1,89 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Scale, AlertCircle, Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { AlertCircle, Mail, Lock, Eye, EyeOff, Scale } from 'lucide-react';
+
+const ROLES = [
+  {
+    id: 'owner',
+    label: 'Owner',
+    desc: 'Manage instruments, submit applications & track certificates',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="14" width="28" height="22" rx="2" stroke="#0D2B43" strokeWidth="2" fill="none"/>
+        <rect x="14" y="6" width="12" height="10" rx="1" stroke="#0D2B43" strokeWidth="2" fill="none"/>
+        <line x1="10" y1="20" x2="30" y2="20" stroke="#0D2B43" strokeWidth="1.5"/>
+        <line x1="10" y1="24" x2="30" y2="24" stroke="#0D2B43" strokeWidth="1.5"/>
+        <line x1="10" y1="28" x2="26" y2="28" stroke="#0D2B43" strokeWidth="1.5"/>
+        <path d="M14 2 L14 6 L26 6 L26 2" stroke="#B8860B" strokeWidth="1.5" fill="none"/>
+        <line x1="18" y1="4" x2="22" y2="4" stroke="#B8860B" strokeWidth="1"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'officer',
+    label: 'Officer',
+    desc: 'Review, inspect, certify applications & manage complaints',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 4 L34 10 L34 20 C34 28 28 34 20 36 C12 34 6 28 6 20 L6 10 Z" stroke="#0D2B43" strokeWidth="2" fill="none"/>
+        <path d="M20 8 L28 12 L28 20 C28 26 24 30 20 32 C16 30 12 26 12 20 L12 12 Z" stroke="#B8860B" strokeWidth="1.5" fill="none"/>
+        <circle cx="20" cy="20" r="4" stroke="#0D2B43" strokeWidth="2" fill="none"/>
+        <circle cx="20" cy="20" r="1.5" fill="#0D2B43"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'public',
+    label: 'Public User',
+    desc: 'Verify instruments, register complaints & check certificates',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="14" r="6" stroke="#0D2B43" strokeWidth="2" fill="none"/>
+        <path d="M8 34 C8 26 12 22 20 22 C28 22 32 26 32 34" stroke="#0D2B43" strokeWidth="2" fill="none"/>
+        <circle cx="20" cy="14" r="2" stroke="#B8860B" strokeWidth="1.5" fill="none"/>
+        <path d="M6 28 Q10 24 14 28" stroke="#B8860B" strokeWidth="1" fill="none"/>
+        <path d="M34 28 Q30 24 26 28" stroke="#B8860B" strokeWidth="1" fill="none"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'admin',
+    label: 'Admin',
+    desc: 'Manage users, instruments, applications & system settings',
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="16" r="5" stroke="#0D2B43" strokeWidth="2" fill="none"/>
+        <path d="M6 30 C6 24 10 20 20 20 C30 20 34 24 34 30" stroke="#0D2B43" strokeWidth="2" fill="none"/>
+        <circle cx="20" cy="16" r="2" stroke="#B8860B" strokeWidth="1.5" fill="none"/>
+        <path d="M10 22 L14 20" stroke="#B8860B" strokeWidth="1" fill="none"/>
+        <path d="M26 20 L30 22" stroke="#B8860B" strokeWidth="1" fill="none"/>
+        <path d="M14 26 L18 24" stroke="#B8860B" strokeWidth="1" fill="none"/>
+        <path d="M22 24 L26 26" stroke="#B8860B" strokeWidth="1" fill="none"/>
+      </svg>
+    ),
+  },
+];
+
+function RoleIcon({ id, icon, active, onClick }) {
+  return (
+    <div
+      className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+        active
+          ? 'border-amber-500 bg-amber-50 shadow-sm'
+          : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50'
+      }`}
+      onClick={onClick}
+    >
+      <div className={`flex items-center justify-center ${active ? 'text-amber-600' : 'text-[#0D2B43]'}`}>
+        {icon}
+      </div>
+      <span className={`text-xs font-semibold ${active ? 'text-amber-700' : 'text-gray-700'}`}>
+        {ROLES.find(r => r.id === id)?.label}
+      </span>
+    </div>
+  );
+}
 
 export default function Login() {
   const { login } = useApp();
@@ -10,6 +92,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,7 +107,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gray-100 relative overflow-hidden">
       <div className="h-screen w-full relative">
-        {/* Left section - 55% deep navy government panel */}
+        {/* Left section - deep navy government panel */}
         <div className="absolute left-0 top-0 h-full w-3/5 bg-[#0D2B43] relative flex flex-col">
 
           {/* Government emblem at top-left */}
@@ -50,22 +133,29 @@ export default function Login() {
               This digital portal enables instrument owners, government officers and citizens to manage verification, certification, inspection and complaint services through a secure and integrated system.
             </p>
 
-            {/* Service Section - four clean blocks */}
-            <div className="mt-6 flex gap-2 flex-wrap justify-center text-xs">
-              <span key="Owner" className="rounded-md bg-amber-400/20 px-3 py-1.5 font-medium text-amber-300 border border-amber-400/30">Owner</span>
-              <span key="Officer" className="rounded-md bg-amber-400/20 px-3 py-1.5 font-medium text-amber-300 border border-amber-400/30">Officer</span>
-              <span key="Admin" className="rounded-md bg-amber-400/20 px-3 py-1.5 font-medium text-amber-300 border border-amber-400/30">Admin</span>
-              <span key="PublicVerify" className="rounded-md bg-amber-400/20 px-3 py-1.5 font-medium text-amber-300 border border-amber-400/30">Public<br/>Verify</span>
+            {/* Role Cards */}
+            <div className="mt-4">
+              <div className="text-xs font-semibold text-amber-300 uppercase tracking-wider mb-3">Select Your Role</div>
+              <div className="grid grid-cols-2 gap-3">
+                {ROLES.map(role => (
+                  <RoleIcon
+                    key={role.id}
+                    id={role.id}
+                    icon={role.icon}
+                    active={selectedRole === role.id}
+                    onClick={() => setSelectedRole(role.id)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Diagonal separator between blue and white sections */}
+        {/* Diagonal separator */}
         <div className="absolute top-0 right-[40%] h-full w-4 bg-[#0D2B43] transform rotate-[3deg] origin-top-right" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)' }} />
 
-        {/* Right section - 45% white login card area */}
+        {/* Right section - white login card area */}
         <div className="absolute right-0 top-0 h-full w-2/5 bg-white flex items-center justify-center p-6 sm:p-8">
-          {/* Login card - full width, no extra margins */}
           <div className="w-full max-w-md">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-gray-800 m-0">Welcome Back!</h2>

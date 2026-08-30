@@ -31,7 +31,6 @@ export default function ApplicationDetail() {
   const { id } = useParams();
   const { appApplications, appInstruments, appUsers, appCertificates, updateApplication } = useApp();
   const { t } = useLanguage();
-  const [showPayment, setShowPayment] = useState(false);
   const [paymentPhase, setPaymentPhase] = useState('idle');
   const [countdown, setCountdown] = useState(0);
   const [txnId, setTxnId] = useState('');
@@ -53,41 +52,49 @@ export default function ApplicationDetail() {
     phaseRef.current = paymentPhase;
   }, [paymentPhase]);
 
-  // Start 5-minute countdown when payment phase becomes "waiting"
+  // Auto-start 15-second payment timer when payment is pending
+  // eslint-disable-next-line react/set-state-in-effect
+  useEffect(() => {
+    if (app && app.paymentStatus !== 'PAID' && paymentPhase === 'idle') {
+      setPaymentPhase('waiting');
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Start 15-second countdown when payment phase becomes "waiting"
   // eslint-disable-next-line react/set-state-in-effect
   useEffect(() => {
     if (paymentPhase === 'waiting') {
        const startTime = Date.now();
-       const fourMinutes = 4 * 60 * 1000;
+       const countdownDuration = 15 * 1000;
 
        timerRef.current = setInterval(() => {
          const elapsed = Date.now() - startTime;
-         const remaining = fourMinutes - elapsed;
+         const remaining = countdownDuration - elapsed;
 
-        if (remaining <= 0) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-          const now = new Date();
-          const txn = generateTxnId();
-          setTxnId(txn);
-          setConfirmedAt(now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
-          setPaymentPhase('paid');
-          if (id) {
-            updateApplication(id, { paymentStatus: 'PAID', status: 'SUBMITTED', officerId: getDefaultOfficer() });
-          }
-        } else {
-          setCountdown(remaining);
-        }
-      }, 250);
-    }
+         if (remaining <= 0) {
+           clearInterval(timerRef.current);
+           timerRef.current = null;
+           const now = new Date();
+           const txn = generateTxnId();
+           setTxnId(txn);
+           setConfirmedAt(now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
+           setPaymentPhase('paid');
+           if (id) {
+             updateApplication(id, { paymentStatus: 'PAID', status: 'SUBMITTED', officerId: getDefaultOfficer() });
+           }
+         } else {
+           setCountdown(remaining);
+         }
+       }, 250);
+     }
 
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [paymentPhase, id, updateApplication]);
+     return () => {
+       if (timerRef.current) {
+         clearInterval(timerRef.current);
+         timerRef.current = null;
+       }
+     };
+   }, [paymentPhase, id, updateApplication]);
 
   // Sync paymentPhase with app.paymentStatus from context
   // eslint-disable-next-line react/set-state-in-effect
@@ -105,16 +112,6 @@ export default function ApplicationDetail() {
   const certificate = appCertificates.find(c => c.applicationId === app.id);
 
   const isPaid = app.paymentStatus === 'PAID' || paymentPhase === 'paid';
-
-  const handlePayNow = () => {
-    if (!qrImage) return;
-    const txn = generateTxnId();
-    setTxnId(txn);
-    setConfirmedAt('');
-    setPaymentPhase('waiting');
-     setCountdown(4 * 60 * 1000);
-    setShowPayment(true);
-  };
 
   const handleSendMessage = () => {
     if (!newMessage.trim()) return;
@@ -182,7 +179,6 @@ export default function ApplicationDetail() {
               {txnId && `${t('transactionId')}: ${txnId}`}
               {confirmedAt && `\n${t('confirmed')}: ${confirmedAt}`}
             </div>
-            <div className="mt-1.5 text-xs text-gray-500">{t('demoTxnNote')}</div>
             <div className="mt-2 text-sm text-gray-700">
               {t('paymentCompletedMsg').replace('{fee}', verificationFee).replace('{type}', machineType)}
             </div>
@@ -190,57 +186,41 @@ export default function ApplicationDetail() {
         ) : (
           <div>
             <Field label={t('verificationFee')} value={`₹${verificationFee}`} className="text-blue-800" />
-            <div className="mt-4">
-              <button
-                onClick={handlePayNow}
-                disabled={!qrImage}
-                className={`cursor-pointer rounded-md px-5 py-3 text-sm font-semibold text-white hover:opacity-90 ${
-                  qrImage ? 'bg-blue-800 hover:bg-blue-900' : 'bg-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {t('payNow')}
-              </button>
+            <div className="mt-5 rounded-md border border-gray-200 bg-gray-50 px-4 py-5 text-center">
+              <div className="font-bold text-gray-800">{t('verificationFee')}: ₹{verificationFee}</div>
+              <div className="mt-1 text-xs text-gray-500">{t('qrValidFor').replace('{time}', '5:00')}</div>
+              <div className="mt-1 text-sm text-gray-600">{t('scanAndPay')}</div>
+              {qrImage ? (
+                <div className="mt-3 inline-block rounded-md border border-gray-200 bg-white p-2.5">
+                  <img src={qrImage} alt={`${machineType} QR`} className="h-40 w-40 object-contain" />
+                </div>
+              ) : (
+                <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {t('qrNotAvailable')}
+                </div>
+              )}
+              {paymentPhase === 'waiting' && (
+                <div className="mt-4">
+                  <div className="text-lg font-bold text-amber-800">{t('waitingForPayment')}</div>
+                  <div className="mt-1 text-sm font-semibold text-amber-700">
+                    {t('countdownTimer').replace('{time}', formatCountdown(countdown))}
+                  </div>
+                  <div className="mt-1 text-xs text-amber-600">{t('paymentPending')}</div>
+                </div>
+              )}
+              {paymentPhase === 'paid' && !confirmedAt && (
+                <div className="mt-4">
+                  <div className="text-sm font-semibold text-amber-700">{t('paymentPending')}</div>
+                </div>
+              )}
+              {confirmedAt && (
+                <div className="mt-3 rounded-md border border-green-200 bg-green-50 px-4 py-3">
+                  <div className="text-base font-bold text-green-800">{t('paymentSuccessful')}</div>
+                  <div className="mt-1.5 text-sm font-semibold text-gray-800">{t('transactionId')}: <span className="font-mono">{txnId}</span></div>
+                  <div className="mt-1 text-sm text-gray-700">{t('confirmed')}: {confirmedAt}</div>
+                </div>
+              )}
             </div>
-
-            {showPayment && (
-              <div className="mt-5 rounded-md border border-gray-200 bg-gray-50 px-4 py-5 text-center">
-                <div className="mb-3 text-xs text-amber-700 bg-amber-50 rounded-md px-3 py-2 inline-block">{t('demoPayment')}</div>
-                <div className="font-bold text-gray-800">{t('verificationFee')}: ₹{verificationFee}</div>
-                <div className="mt-1 text-sm text-gray-600">{t('scanAndPay')}</div>
-                {qrImage ? (
-                  <div className="mt-3 inline-block rounded-md border border-gray-200 bg-white p-2.5">
-                    <img src={qrImage} alt={`${machineType} QR`} className="h-40 w-40 object-contain" />
-                  </div>
-                ) : (
-                  <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {t('qrNotAvailable')}
-                  </div>
-                )}
-                {paymentPhase === 'waiting' && (
-                  <div className="mt-4">
-                    <div className="text-lg font-bold text-amber-800">{t('waitingForPayment')}</div>
-                    <div className="mt-1 text-sm font-semibold text-amber-700">
-                      {t('countdownTimer').replace('{time}', formatCountdown(countdown))}
-                    </div>
-                    <div className="mt-1 text-xs text-amber-600">{t('paymentPending')}</div>
-                    <div className="mt-2 text-xs text-gray-500">{t('demoTxnNote')}</div>
-                  </div>
-                )}
-                {paymentPhase === 'paid' && !confirmedAt && (
-                  <div className="mt-4">
-                    <div className="text-sm font-semibold text-amber-700">{t('paymentPending')}</div>
-                  </div>
-                )}
-                {confirmedAt && (
-                  <div className="mt-3 rounded-md border border-green-200 bg-green-50 px-4 py-3">
-                    <div className="text-base font-bold text-green-800">{t('paymentSuccessful')}</div>
-                    <div className="mt-1.5 text-sm font-semibold text-gray-800">{t('transactionId')}: <span className="font-mono">{txnId}</span></div>
-                    <div className="mt-1 text-sm text-gray-700">{t('confirmed')}: {confirmedAt}</div>
-                    <div className="mt-1 text-xs text-gray-500">{t('demoTxnNote')}</div>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         )}
       </Card>
