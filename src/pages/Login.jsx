@@ -25,15 +25,15 @@ export default function Login() {
       <div className="w-full max-w-5xl overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm min-h-[440px]">
         {/* Government accent band */}
         <div className="flex h-1.5">
-          <div className="flex-1 bg-[#163A5F]" />
+          <div className="flex-1 bg-[#0D2B43]" />
           <div className="flex-1 bg-amber-400" />
           <div className="flex-1 bg-green-700" />
         </div>
 
         <div className="grid md:grid-cols-2">
-          <div className="flex flex-col justify-center bg-[#163A5F] p-10 text-white lg:p-12">
+          <div className="flex flex-col justify-center bg-[#0D2B43] p-10 text-white lg:p-12">
             <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#163A5F] text-amber-400">
+              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#0D2B43] text-amber-400">
                 <Scale size={32} />
               </div>
               <div>
@@ -47,7 +47,7 @@ export default function Login() {
             </p>
             <div className="mt-5 flex flex-wrap gap-2 text-xs">
               {['Owner', 'Officer', 'Admin', 'Public Verify'].map(r => (
-                <span key={r} className="rounded-md bg-[#163A5F] px-3 py-1 font-medium text-blue-100">{r}</span>
+                <span key={r} className="rounded-md bg-[#0D2B43] px-3 py-1 font-medium text-blue-100">{r}</span>
               ))}
             </div>
           </div>
@@ -69,7 +69,7 @@ export default function Login() {
               <Label>Password</Label>
               <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
 
-              <button className="mt-5 w-full cursor-pointer rounded-md bg-[#163A5F] px-4 py-3 text-sm font-semibold text-white hover:bg-[#163A5F]">
+              <button className="mt-5 w-full cursor-pointer rounded-md bg-[#0D2B43] px-4 py-3 text-sm font-semibold text-white hover:bg-[#0D2B43]">
                 Sign In
               </button>
             </form>
