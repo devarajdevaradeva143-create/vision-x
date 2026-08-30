@@ -10,9 +10,10 @@ export default function CertificateDetail() {
   const { id } = useParams();
   const { appCertificates } = useApp();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const cert = appCertificates.find(c => c.applicationId === id);
-  if (!cert) return <Card><p className="text-sm text-gray-600">Certificate not found.</p></Card>;
+  if (!cert) return <Card><p className="text-sm text-gray-600">{t('certificateNotFound')}</p></Card>;
 
   return <CertificateView cert={cert} onBack={() => navigate(-1)} />;
 }

@@ -70,7 +70,7 @@ export function ProgressTracker({ status }) {
   if (status === 'PAYMENT_PENDING') {
     return (
       <div className="rounded-md border border-amber-200 bg-amber-100 px-4 py-3 text-sm font-medium text-amber-800">
-        ⏳ Payment Pending — complete the payment to submit this application for verification.
+        {t('progressPaymentPending')}
       </div>
     );
   }
@@ -78,7 +78,7 @@ export function ProgressTracker({ status }) {
   if (isRejected) {
     return (
       <div className="rounded-md border border-red-200 bg-red-100 px-4 py-3 text-sm font-medium text-red-800">
-        ⚠ This application was REJECTED during inspection. Please review the remarks and re-apply.
+        {t('progressRejected')}
       </div>
     );
   }

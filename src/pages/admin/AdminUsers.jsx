@@ -83,7 +83,7 @@ export default function AdminUsers() {
                   ? 'cursor-pointer rounded-md bg-blue-800 px-3.5 py-2 text-xs font-semibold text-white hover:bg-blue-900'
                   : 'cursor-pointer rounded-md border border-gray-300 bg-white px-3.5 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100'
               }
-            >{f === 'ALL' ? t('filterAll') : f}</button>
+            >{f === 'ALL' ? t('filterAll') : t(f)}</button>
           ))}
         </div>
         <Table headers={[t('tableId'), t('nameTable'), t('email'), t('roleTable'), t('statusTableUser'), t('actions')]}>
@@ -94,9 +94,9 @@ export default function AdminUsers() {
               <td className="px-4 py-3 text-sm text-gray-700">{user.email}</td>
               <td className="px-4 py-3">
                 <select value={user.role} onChange={e => setRole(user, e.target.value)} className="rounded-md border border-gray-300 px-2 py-1.5 text-xs text-gray-700 focus:border-blue-700 focus:outline-none">
-                  <option value="owner">owner</option>
-                  <option value="officer">officer</option>
-                  <option value="admin">admin</option>
+                  <option value="owner">{t('owner')}</option>
+                  <option value="officer">{t('officer')}</option>
+                  <option value="admin">{t('admin')}</option>
                 </select>
               </td>
               <td className="px-4 py-3">

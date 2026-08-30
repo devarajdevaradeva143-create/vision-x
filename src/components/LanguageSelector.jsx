@@ -5,7 +5,8 @@ import { useLanguage } from '../context/LanguageContext';
 // ---------------------------------------------------------------------------
 // LanguageSelector
 // ---------------------------------------------------------------------------
-// A small dropdown that lets the user switch between English / Tamil / Hindi.
+// A small dropdown that lets the user switch between English / Tamil / Hindi /
+// Malayalam / Bengali / Telugu / Kannada.
 // It is rendered ONLY inside the main application (Layout), never on the Login
 // page. When the user picks a language, the whole UI updates instantly because
 // every page reads text through the shared `t()` translation helper.
@@ -15,6 +16,10 @@ const LANGUAGES = [
   { code: 'en', label: 'English' },
   { code: 'ta', label: 'தமிழ்' },
   { code: 'hi', label: 'हिन्दी' },
+  { code: 'ml', label: 'മലയാളം' },
+  { code: 'bn', label: 'বাংলা' },
+  { code: 'te', label: 'తెలుగు' },
+  { code: 'kn', label: 'ಕನ್ನಡ' },
 ];
 
 export default function LanguageSelector() {

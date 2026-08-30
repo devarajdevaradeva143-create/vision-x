@@ -6,7 +6,8 @@ import { translations } from '../data/translations';
 // ---------------------------------------------------------------------------
 // This module provides the global language state for the ENTIRE application.
 //
-//  - en = English, ta = Tamil, hi = Hindi
+//  - en = English, ta = Tamil, hi = Hindi, ml = Malayalam, bn = Bengali,
+//    te = Telugu, kn = Kannada
 //  - The selected language is persisted to localStorage so it survives a page
 //    refresh or navigating between pages (dashboard -> application -> payment
 //    -> certificate ...).
