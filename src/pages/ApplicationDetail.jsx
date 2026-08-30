@@ -1,42 +1,101 @@
-import { useMemo, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Card, PageHeader, StatusBadge, ProgressTracker, Field, DetailRow } from '../components/ui';
-import { QRCodeSVG } from 'qrcode.react';
-import { getMachineTypeByName, qrDataFor } from '../data/machineTypes';
+import { getMachineTypeByName } from '../data/machineTypes';
 import { getDefaultOfficer } from '../data/mockData';
 import { fmt } from '../utils/format';
 
-// ---------------------------------------------------------------------------
-// Application Detail (Owner view)
-// ---------------------------------------------------------------------------
-// Shows the application details plus a dedicated PAYMENT section.
-//
-// The verification fee and matching payment QR are derived from the machine
-// type associated with this application (see data/machineTypes.js). They are
-// never entered manually by the owner.
-//
-// Before payment  -> Payment Status: Pending, Application Status: Payment Pending
-// After  payment  -> Payment Status: Paid,   Application Status: Submitted
-// ---------------------------------------------------------------------------
+function formatCountdown(remainingMs) {
+  const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+function generateTxnId() {
+  const rand = String(Math.floor(Math.random() * 100000000)).padStart(8, '0');
+  return `TXN-DEMO-${rand}`;
+}
+
+function formatMessageTime(dateStr) {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' +
+      d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  } catch { return dateStr; }
+}
 
 export default function ApplicationDetail() {
   const { id } = useParams();
   const { appApplications, appInstruments, appUsers, appCertificates, updateApplication } = useApp();
   const { t } = useLanguage();
   const [showPayment, setShowPayment] = useState(false);
+  const [paymentPhase, setPaymentPhase] = useState('idle');
+  const [countdown, setCountdown] = useState(0);
+  const [txnId, setTxnId] = useState('');
+  const [confirmedAt, setConfirmedAt] = useState('');
+  const [newMessage, setNewMessage] = useState('');
+  const [showMessages, setShowMessages] = useState(false);
+  const timerRef = useRef(null);
+  const phaseRef = useRef(paymentPhase);
+  const messagesEndRef = useRef(null);
 
   const app = appApplications.find(a => a.id === id);
 
-  // Machine type of this application: use the one chosen at submission time,
-  // falling back to the linked instrument category if not set.
   const machineType = app ? (app.machineType || appInstruments.find(i => i.id === app.instrumentId)?.category || '') : '';
-
-  // Find the matching fee and QR value for this machine type.
-  const typeInfo = useMemo(() => getMachineTypeByName(machineType), [machineType]);
+  const typeInfo = getMachineTypeByName(machineType);
   const verificationFee = typeInfo ? typeInfo.fee : 0;
-  const qrValue = typeInfo ? qrDataFor(typeInfo) : '';
+  const qrImage = typeInfo ? typeInfo.qrImage : null;
+
+  useEffect(() => {
+    phaseRef.current = paymentPhase;
+  }, [paymentPhase]);
+
+  // Start 5-minute countdown when payment phase becomes "waiting"
+  // eslint-disable-next-line react/set-state-in-effect
+  useEffect(() => {
+    if (paymentPhase === 'waiting') {
+       const startTime = Date.now();
+       const fourMinutes = 4 * 60 * 1000;
+
+       timerRef.current = setInterval(() => {
+         const elapsed = Date.now() - startTime;
+         const remaining = fourMinutes - elapsed;
+
+        if (remaining <= 0) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+          const now = new Date();
+          const txn = generateTxnId();
+          setTxnId(txn);
+          setConfirmedAt(now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
+          setPaymentPhase('paid');
+          if (id) {
+            updateApplication(id, { paymentStatus: 'PAID', status: 'SUBMITTED', officerId: getDefaultOfficer() });
+          }
+        } else {
+          setCountdown(remaining);
+        }
+      }, 250);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [paymentPhase, id, updateApplication]);
+
+  // Sync paymentPhase with app.paymentStatus from context
+  // eslint-disable-next-line react/set-state-in-effect
+  useEffect(() => {
+    if (app && app.paymentStatus === 'PAID') {
+      setPaymentPhase('paid');
+    }
+  }, [app]);
 
   if (!app) return <Card><p className="text-sm text-gray-600">{t('applicationNotFound')}</p></Card>;
 
@@ -45,14 +104,30 @@ export default function ApplicationDetail() {
   const officer = app.officerId ? appUsers.find(u => u.id === app.officerId) : null;
   const certificate = appCertificates.find(c => c.applicationId === app.id);
 
-  const isPaid = app.paymentStatus === 'PAID';
+  const isPaid = app.paymentStatus === 'PAID' || paymentPhase === 'paid';
 
-  const completePayment = () => {
-    // Once paid, the application becomes "Submitted". Assign a default officer
-    // so the SAME application (same ID) appears in that officer's dashboard —
-    // we only update this one application object, never create a new one.
-    updateApplication(app.id, { paymentStatus: 'PAID', status: 'SUBMITTED', officerId: getDefaultOfficer() });
-    setShowPayment(false);
+  const handlePayNow = () => {
+    if (!qrImage) return;
+    const txn = generateTxnId();
+    setTxnId(txn);
+    setConfirmedAt('');
+    setPaymentPhase('waiting');
+     setCountdown(4 * 60 * 1000);
+    setShowPayment(true);
+  };
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim()) return;
+    const now = new Date().toISOString();
+    const updatedApp = {
+      ...app,
+      messages: [
+        ...(app.messages || []),
+        { from: 'owner', to: 'officer', text: newMessage.trim(), timestamp: now },
+      ],
+    };
+    updateApplication(app.id, { messages: updatedApp.messages });
+    setNewMessage('');
   };
 
   return (
@@ -80,7 +155,7 @@ export default function ApplicationDetail() {
             <Field label={t('machineId')} value={instrument?.id || '—'} />
             <Field label={t('instrument')} value={instrument?.modelNumber || '—'} />
             <Field label={t('verificationFee')} value={verificationFee ? `₹${verificationFee}` : '—'} className={verificationFee ? 'text-blue-800' : ''} />
-            <Field label={t('paymentStatus')} value={isPaid ? t('paid') : t('pendingPayment')} className={isPaid ? 'text-green-800' : 'text-amber-800'} />
+            <Field label={t('paymentStatus')} value={isPaid ? t('paymentPaid') : t('pendingPayment')} className={isPaid ? 'text-green-800' : 'text-amber-800'} />
           </DetailRow>
         </Card>
 
@@ -102,8 +177,13 @@ export default function ApplicationDetail() {
         {isPaid ? (
           <div className="rounded-md border border-green-200 bg-green-100 px-5 py-5 text-center">
             <div className="text-3xl">✓</div>
-            <div className="text-base font-bold text-green-800">{t('paymentCompleted')}</div>
+            <div className="text-base font-bold text-green-800">{t('paymentSuccessful')}</div>
             <div className="mt-1.5 text-sm text-gray-700">
+              {txnId && `${t('transactionId')}: ${txnId}`}
+              {confirmedAt && `\n${t('confirmed')}: ${confirmedAt}`}
+            </div>
+            <div className="mt-1.5 text-xs text-gray-500">{t('demoTxnNote')}</div>
+            <div className="mt-2 text-sm text-gray-700">
               {t('paymentCompletedMsg').replace('{fee}', verificationFee).replace('{type}', machineType)}
             </div>
           </div>
@@ -112,31 +192,110 @@ export default function ApplicationDetail() {
             <Field label={t('verificationFee')} value={`₹${verificationFee}`} className="text-blue-800" />
             <div className="mt-4">
               <button
-                onClick={() => setShowPayment(!showPayment)}
-                className={showPayment
-                  ? 'cursor-pointer rounded-md border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100'
-                  : 'cursor-pointer rounded-md bg-blue-800 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-900'}
+                onClick={handlePayNow}
+                disabled={!qrImage}
+                className={`cursor-pointer rounded-md px-5 py-3 text-sm font-semibold text-white hover:opacity-90 ${
+                  qrImage ? 'bg-blue-800 hover:bg-blue-900' : 'bg-gray-400 cursor-not-allowed'
+                }`}
               >
-                {showPayment ? t('cancel') : t('pay').replace('{fee}', verificationFee)}
+                {t('payNow')}
               </button>
             </div>
 
             {showPayment && (
               <div className="mt-5 rounded-md border border-gray-200 bg-gray-50 px-4 py-5 text-center">
+                <div className="mb-3 text-xs text-amber-700 bg-amber-50 rounded-md px-3 py-2 inline-block">{t('demoPayment')}</div>
                 <div className="font-bold text-gray-800">{t('verificationFee')}: ₹{verificationFee}</div>
-                <div className="text-sm text-gray-600">{t('scanQr')}</div>
-
-                {/* Unique QR for this application's machine type */}
-                <div className="mt-3 inline-block rounded-md border border-gray-200 bg-white p-2.5">
-                  <QRCodeSVG value={qrValue || ' '} size={160} />
-                </div>
-
-                <div className="mt-3.5 text-sm font-bold text-gray-800">{t('amount').replace('{fee}', verificationFee)}</div>
-                <div className="mt-2 text-sm font-semibold text-amber-800">{t('paymentStatusPending')}</div>
-
-                <button onClick={completePayment} className="mt-4 cursor-pointer rounded-md bg-green-700 px-5 py-3 text-sm font-semibold text-white hover:bg-green-800">{t('paymentCompletedBtn')}</button>
+                <div className="mt-1 text-sm text-gray-600">{t('scanAndPay')}</div>
+                {qrImage ? (
+                  <div className="mt-3 inline-block rounded-md border border-gray-200 bg-white p-2.5">
+                    <img src={qrImage} alt={`${machineType} QR`} className="h-40 w-40 object-contain" />
+                  </div>
+                ) : (
+                  <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {t('qrNotAvailable')}
+                  </div>
+                )}
+                {paymentPhase === 'waiting' && (
+                  <div className="mt-4">
+                    <div className="text-lg font-bold text-amber-800">{t('waitingForPayment')}</div>
+                    <div className="mt-1 text-sm font-semibold text-amber-700">
+                      {t('countdownTimer').replace('{time}', formatCountdown(countdown))}
+                    </div>
+                    <div className="mt-1 text-xs text-amber-600">{t('paymentPending')}</div>
+                    <div className="mt-2 text-xs text-gray-500">{t('demoTxnNote')}</div>
+                  </div>
+                )}
+                {paymentPhase === 'paid' && !confirmedAt && (
+                  <div className="mt-4">
+                    <div className="text-sm font-semibold text-amber-700">{t('paymentPending')}</div>
+                  </div>
+                )}
+                {confirmedAt && (
+                  <div className="mt-3 rounded-md border border-green-200 bg-green-50 px-4 py-3">
+                    <div className="text-base font-bold text-green-800">{t('paymentSuccessful')}</div>
+                    <div className="mt-1.5 text-sm font-semibold text-gray-800">{t('transactionId')}: <span className="font-mono">{txnId}</span></div>
+                    <div className="mt-1 text-sm text-gray-700">{t('confirmed')}: {confirmedAt}</div>
+                    <div className="mt-1 text-xs text-gray-500">{t('demoTxnNote')}</div>
+                  </div>
+                )}
               </div>
             )}
+          </div>
+        )}
+      </Card>
+
+      {/* ------------------- MESSAGE BOX ------------------- */}
+      <Card className="mt-4">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="m-0 text-base font-bold text-gray-800">{t('messageBox')}</h3>
+          <button
+            onClick={() => setShowMessages(!showMessages)}
+            className="cursor-pointer rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900"
+          >
+            {t('chat')}
+          </button>
+        </div>
+
+        {showMessages && (
+          <div>
+            <div className="mb-3 text-xs text-gray-500">{t('officerMessage')} / {t('ownerMessage')} — {t('messageBox')}</div>
+            <div className="mb-2 max-h-64 overflow-y-auto rounded-md border border-gray-200 bg-gray-50 p-3">
+              {(app.messages && app.messages.length > 0) ? (
+                app.messages.map((msg, idx) => (
+                  <div key={idx} className={`mb-2 ${msg.from === 'owner' ? 'text-right' : 'text-left'}`}>
+                    <div className={`inline-block rounded-md px-3 py-2 text-sm ${
+                      msg.from === 'owner' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                    }`}>
+                      <div className="text-xs font-bold mb-0.5">
+                        {msg.from === 'owner' ? t('ownerMessage') : t('officerMessage')}
+                      </div>
+                      <div>{msg.text}</div>
+                      <div className="mt-0.5 text-xs opacity-70">{formatMessageTime(msg.timestamp)}</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-sm text-gray-400">{t('noMessages')}</div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={e => setNewMessage(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+                placeholder={t('messagePlaceholder')}
+                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-700 focus:outline-none"
+              />
+              <button
+                onClick={handleSendMessage}
+                className="cursor-pointer rounded-md bg-blue-800 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900"
+              >
+                {t('sendMessage')}
+              </button>
+            </div>
           </div>
         )}
       </Card>

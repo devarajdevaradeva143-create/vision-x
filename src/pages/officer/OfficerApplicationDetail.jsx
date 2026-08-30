@@ -25,8 +25,6 @@ export default function OfficerApplicationDetail() {
   const owner = appUsers.find(u => u.id === app.ownerId);
   const certificate = appCertificates.find(c => c.applicationId === app.id);
 
-  // Show the machine details the owner actually submitted (snapshot on the app),
-  // falling back to the linked instrument / user where needed.
   const machineType = app.machineType || instrument?.category;
   const manufacturer = app.manufacturer ?? instrument?.manufacturer;
   const model = app.modelNumber ?? instrument?.modelNumber;
@@ -44,11 +42,24 @@ export default function OfficerApplicationDetail() {
     setMsg({ type: 'success', text: t('inspectionScheduledMsg').replace('{date}', fmt(scheduleDate)) });
   };
 
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      updateApplication(app.id, { machinePhoto: ev.target.result });
+      setMsg({ type: 'success', text: t('photoUploaded') });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePhoto = () => {
+    updateApplication(app.id, { machinePhoto: null });
+    setMsg({ type: 'success', text: t('photoRemoved') });
+  };
+
   const issueCertificate = (result) => {
     const existing = appCertificates.find(c => c.applicationId === app.id);
-    // Store the certificate as a permanent issued SNAPSHOT: it holds every
-    // detail shown on the public verification page so the QR always matches
-    // the exact issued certificate and cannot be altered by later edits.
     const cert = {
       ...(existing || {}),
       id: existing?.id || generateCertificateId(),
@@ -71,6 +82,7 @@ export default function OfficerApplicationDetail() {
       status: result,
       officerId: currentUser.id,
       officerName: currentUser.name,
+      machinePhoto: app.machinePhoto || null,
     };
     addCertificate(cert);
     updateApplication(app.id, { status: result, inspectionDate: new Date().toISOString().slice(0, 10) });
@@ -183,14 +195,30 @@ export default function OfficerApplicationDetail() {
 
         {app.status === 'INSPECTED' && (
           <div>
-            {app.readings ? (
+            {app.readings && (
               <div className="mb-3.5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {Object.entries(app.readings).map(([k, v]) => (
                   <Field key={k} label={k} value={v} />
                 ))}
               </div>
-            ) : null}
+            )}
             <div className="mb-2 text-sm text-gray-700"><b className="text-gray-800">{t('remarks')}</b> {app.remarks || '—'}</div>
+
+            {/* Machine photo upload */}
+            <div className="mb-3.5">
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">{t('uploadMachinePhoto')}</label>
+              <input type="file" accept="image/*" onChange={handlePhotoUpload} className="w-full max-w-sm cursor-pointer text-sm text-gray-600 file:mr-4 file:rounded-md file:border-0 file:bg-blue-800 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-900" />
+              {app.machinePhoto && (
+                <div className="mt-2 flex items-center gap-3">
+                  <img src={app.machinePhoto} alt={t('machinePhoto')} className="h-32 w-32 object-contain rounded-md border border-gray-200" />
+                  <button onClick={handleRemovePhoto} className="cursor-pointer rounded-md bg-red-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-800">{t('removeQR')}</button>
+                </div>
+              )}
+              {!app.machinePhoto && (
+                <div className="mt-1 text-xs text-gray-500">{t('noPhotoUploaded')}</div>
+              )}
+            </div>
+
             <div className="border-t border-gray-200 pt-3.5">
               <div className="mb-2.5 text-sm font-bold text-gray-800">{t('decision')}</div>
               <div className="flex flex-wrap items-center gap-3">
@@ -225,6 +253,11 @@ export default function OfficerApplicationDetail() {
                 <div>
                   <div className="text-sm font-bold text-green-800">{t('certIssuedText').replace('{id}', certificate.id)}</div>
                   <div className="text-sm text-gray-700">{t('expires').replace('{date}', fmt(certificate.expiryDate))}</div>
+                  {certificate.machinePhoto && (
+                    <div className="mt-2">
+                      <img src={certificate.machinePhoto} alt={t('machinePhoto')} className="h-40 w-40 object-contain rounded-md border border-gray-200" />
+                    </div>
+                  )}
                 </div>
                 <Link to={`/certificates/${app.id}`} className="rounded-md bg-blue-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-900">{t('viewPrintCert')}</Link>
               </div>

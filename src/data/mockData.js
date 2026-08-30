@@ -45,7 +45,9 @@ export const applications = [
     inspectionDate: '2026-07-10',
     status: 'CERTIFIED',
     readings: { accuracy: '±0.0001g', repeatability: '0.00005g', linearity: 'Within limits', eccentricity: '0.0002g' },
-    remarks: 'Instrument meets all OIML Class I standards. Calibration verified successfully.',
+     remarks: 'Instrument meets all OIML Class I standards. Calibration verified successfully.',
+    machinePhoto: null,
+    messages: [],
   },
   {
     id: 'APP-2026-002',
@@ -58,6 +60,8 @@ export const applications = [
     status: 'SCHEDULED',
     readings: null,
     remarks: null,
+    machinePhoto: null,
+    messages: [],
   },
   {
     id: 'APP-2026-003',
@@ -70,6 +74,8 @@ export const applications = [
     status: 'CERTIFIED',
     readings: { accuracy: '±0.5%', flowRate: '48.2 L/min', temperature: '32°C', pressure: '2.1 bar' },
     remarks: 'Fuel dispenser meets standards. Sealed and certified.',
+    machinePhoto: null,
+    messages: [],
   },
   {
     id: 'APP-2026-004',
@@ -82,6 +88,8 @@ export const applications = [
     status: 'SUBMITTED',
     readings: null,
     remarks: null,
+    machinePhoto: null,
+    messages: [],
   },
   {
     id: 'APP-2026-005',
@@ -94,6 +102,8 @@ export const applications = [
     status: 'REJECTED',
     readings: { accuracy: '±2.5%', loadTest: 'FAILED at 35 tonne', zeroError: '12 kg drift', repeatability: 'Poor' },
     remarks: 'Instrument failed load test. Zero drift exceeds permissible limits. Repair and re-apply.',
+    machinePhoto: null,
+    messages: [],
   },
   {
     id: 'APP-2026-006',
@@ -106,6 +116,8 @@ export const applications = [
     status: 'SCHEDULED',
     readings: null,
     remarks: null,
+    machinePhoto: null,
+    messages: [],
   },
   {
     id: 'APP-2026-007',
@@ -118,6 +130,8 @@ export const applications = [
     status: 'SUBMITTED',
     readings: null,
     remarks: null,
+    machinePhoto: null,
+    messages: [],
   },
   {
     id: 'APP-2026-008',
@@ -130,6 +144,8 @@ export const applications = [
     status: 'CERTIFIED',
     readings: { accuracy: '±0.0001g', repeatability: '0.00006g', linearity: 'Within limits', eccentricity: '0.0003g' },
     remarks: 'Previous certification - instrument passed all tests.',
+    machinePhoto: null,
+    messages: [],
   },
 ];
 
@@ -147,8 +163,9 @@ export const certificates = [
     issueDate: '2026-07-12',
     expiryDate: '2027-07-12',
     result: 'CERTIFIED',
-    officerId: 'OFF001',
+     officerId: 'OFF001',
     officerName: 'Inspector Vikram Singh',
+    machinePhoto: null,
   },
   {
     id: 'CERT-2026-002',
@@ -165,6 +182,7 @@ export const certificates = [
     result: 'CERTIFIED',
     officerId: 'OFF002',
     officerName: 'Inspector Anita Desai',
+    machinePhoto: null,
   },
   {
     id: 'CERT-2025-003',
@@ -181,6 +199,7 @@ export const certificates = [
     result: 'CERTIFIED',
     officerId: 'OFF001',
     officerName: 'Inspector Vikram Singh',
+    machinePhoto: null,
   },
 ];
 

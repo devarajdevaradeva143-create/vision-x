@@ -20,7 +20,6 @@ export default function CertificateDetail() {
 
 export function CertificateView({ cert, onBack }) {
   const { t } = useLanguage();
-  // Build the public verification URL (uses VITE_PUBLIC_URL, never localhost).
   const verificationUrl = buildVerifyUrl(cert.id);
   const isExpired = new Date(cert.expiryDate) < new Date();
   const expiringSoon = !isExpired && (new Date(cert.expiryDate) - new Date()) / (1000 * 60 * 60 * 24) <= 30;
@@ -69,6 +68,13 @@ export function CertificateView({ cert, onBack }) {
                 <Field label={t('certificateStatus')} value={statusLabel} className={expiryClass} />
                 <Field label={t('officerTester')} value={cert.officerName} />
               </DetailRow>
+
+              {cert.machinePhoto && (
+                <div className="mt-4">
+                  <div className="mb-1.5 text-sm font-bold text-gray-800">{t('machinePhoto')}</div>
+                  <img src={cert.machinePhoto} alt={t('machinePhoto')} className="h-48 w-48 object-contain rounded-md border border-gray-200" />
+                </div>
+              )}
 
               <div className={`mt-6 rounded-md border p-3.5 ${cert.result === 'CERTIFIED' ? 'border-green-200 bg-green-100' : 'border-red-200 bg-red-100'}`}>
                 <div className={`text-sm font-semibold ${cert.result === 'CERTIFIED' ? 'text-green-800' : 'text-red-800'}`}>
