@@ -69,13 +69,30 @@ export default function PublicComplaint() {
     );
   };
 
-  const handleEvidence = (files) => {
+  // Read an uploaded file as a base64 data URL so the actual image/video bytes
+  // are persisted with the complaint record (survives localStorage + officer
+  // view), instead of a temporary, session-only object URL that gets lost.
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+
+  const handleEvidence = async (files) => {
     const list = Array.from(files || []).slice(0, 4);
     const ok = [];
     setEvidenceError('');
     for (const f of list) {
       if (f.size > 2 * 1024 * 1024) { setEvidenceError(t('complaintEvidenceTooBig')); continue; }
-      ok.push({ name: f.name, size: f.size, url: URL.createObjectURL(f) });
+      try {
+        // base64 data URL keeps the real visible originals for the officer preview.
+        const url = await fileToDataUrl(f);
+        ok.push({ name: f.name, size: f.size, url, type: f.type });
+      } catch {
+        // Skip files that could not be read locally.
+      }
     }
     setEvidence(prev => [...prev, ...ok]);
   };
@@ -96,8 +113,9 @@ export default function PublicComplaint() {
       ownerName: linkedCertificate.ownerName,
       complaintType: type,
       description: description.trim(),
-      // Keep the uploaded evidence as base64-safe metadata (names/file sizes).
-      evidence: evidence.map(e => ({ name: e.name, size: e.size })),
+      // Keep the uploaded evidence as base64 data URLs so the officer can view
+      // the EXACT originals (image/video) later — not just file names.
+      evidence: evidence.map(e => ({ name: e.name, size: e.size, url: e.url, type: e.type })),
       latitude: latitude || null,
       longitude: longitude || null,
       contactName: name.trim(),

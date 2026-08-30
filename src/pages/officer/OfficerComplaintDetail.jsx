@@ -5,6 +5,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { Card, PageHeader, Field, DetailRow, Alert, ComplaintStatusBadge } from '../../components/ui';
 import { fmt } from '../../utils/format';
 import { complaintStatusFlow } from '../../data/mockData';
+import { X, ZoomIn, ZoomOut, Image as ImageIcon, Film } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
 // Officer Complaint Detail.
@@ -122,15 +123,7 @@ export default function OfficerComplaintDetail() {
         {/* Evidence */}
         <div className="mt-5">
           <div className="mb-2 text-sm font-semibold text-gray-700">{t('complaintEvidenceSection')}</div>
-          {complaint.evidence && complaint.evidence.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {complaint.evidence.map((e, i) => (
-                <span key={i} className="rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-700">📎 {e.name}</span>
-              ))}
-            </div>
-          ) : (
-            <span className="text-sm text-gray-500">{t('noEvidenceMsg')}</span>
-          )}
+          <EvidencePreview evidence={complaint.evidence || []} emptyText={t('noEvidenceMsg')} />
         </div>
       </Card>
 
@@ -218,6 +211,111 @@ export default function OfficerComplaintDetail() {
 
 function Label({ children }) {
   return <div className="mb-1 text-sm font-medium text-gray-700">{children}</div>;
+}
+
+// ---------------------------------------------------------------------------
+// EvidencePreview
+//
+// Renders the evidence the Owner uploaded with the complaint as a real preview
+// (image / video) instead of only a file name. The evidence items carry a
+// base64 data URL (`url`) stored on the complaint record, so the EXACT uploaded
+// content is shown. Images are kept inside a responsive card, maintain their
+// aspect ratio, and open a lightbox modal with zoom when clicked. Videos play
+// inline with native controls.
+// ---------------------------------------------------------------------------
+function EvidencePreview({ evidence, emptyText }) {
+  const [zoom, setZoom] = useState(1);
+  const [active, setActive] = useState(null);
+
+  // No evidence uploaded by the Owner -> friendly empty state.
+  if (!evidence || evidence.length === 0) {
+    return <span className="text-sm text-gray-500">{emptyText}</span>;
+  }
+
+  const isVideo = (e) => !!(e.type && e.type.startsWith('video/'));
+
+  // Close the lightbox and reset zoom whenever it is opened/closed.
+  const openLightbox = (e) => { setZoom(1); setActive(e); };
+  const closeLightbox = () => { setActive(null); setZoom(1); };
+
+  return (
+    <>
+      {/* Responsive gallery: one card per evidence file (image or video). */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {evidence.map((e, i) => (
+          <div
+            key={i}
+            className="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
+          >
+            {isVideo(e) ? (
+              // Videos play inline with native controls (no lightbox needed).
+              <div className="flex aspect-video items-center justify-center overflow-hidden bg-gray-100">
+                <video src={e.url} className="h-full w-full object-contain" controls />
+              </div>
+            ) : (
+              // Images are clickable to open the large lightbox preview.
+              <button
+                type="button"
+                onClick={() => openLightbox(e)}
+                className="block w-full cursor-zoom-in"
+              >
+                <div className="flex aspect-video items-center justify-center overflow-hidden bg-gray-100">
+                  <img
+                    src={e.url}
+                    alt={e.name}
+                    className="h-full w-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+              </button>
+            )}
+            <div className="flex items-center gap-1.5 border-t border-gray-100 px-2.5 py-2">
+              {isVideo(e) ? <Film size={14} className="shrink-0 text-gray-500" /> : <ImageIcon size={14} className="shrink-0 text-gray-500" />}
+              <span className="truncate text-xs text-gray-600">{e.name}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Lightbox modal: larger preview with zoom, without touching the page layout. */}
+      {active && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={closeLightbox}
+        >
+          <div className="relative flex max-h-full w-full max-w-4xl flex-col" onClick={e => e.stopPropagation()}>
+            {/* Controls: close + zoom in/out. Zoom scales only the preview box. */}
+            <div className="mb-2 flex items-center justify-end gap-2">
+              <button type="button" onClick={() => setZoom(z => Math.min(3, z + 0.25))} className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-md bg-white/90 text-gray-800 hover:bg-white">
+                <ZoomIn size={18} />
+              </button>
+              <button type="button" onClick={() => setZoom(z => Math.max(0.5, z - 0.25))} className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-md bg-white/90 text-gray-800 hover:bg-white">
+                <ZoomOut size={18} />
+              </button>
+              <button type="button" onClick={closeLightbox} className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-md bg-white/90 text-gray-800 hover:bg-white">
+                <X size={18} />
+              </button>
+            </div>
+            <div
+              className="overflow-auto rounded-lg bg-[#1a1a1a]"
+              style={{ maxHeight: 'calc(100vh - 120px)' }}
+            >
+              {isVideo(active) ? (
+                <video src={active.url} controls className="mx-auto block" style={{ maxWidth: '100%', maxHeight: 'calc(100vh - 120px)' }} />
+              ) : (
+                <img
+                  src={active.url}
+                  alt={active.name}
+                  className="mx-auto block transition-transform duration-150"
+                  style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 const input = 'w-full max-w-md rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-700 focus:outline-none';
